@@ -1,0 +1,1 @@
+(:el-get "installed" :ack "installed" :apache-mode "installed" :django-mode "removed" :anything "installed" :python-pep8 "installed" :smart-tab "installed" :tail "installed" :smooth-scroll "removed" :php-mode "installed" :smooth-scrolling "installed" :zencoding-mode "installed" :haskell-mode "installed" :coffee-mode "installed")

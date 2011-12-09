@@ -1,0 +1,6 @@
+# pack-refs with: peeled 
+b583e342fcb1f105a4d657cc1fff2dd7f797febe refs/remotes/origin/tag-expansion
+f345e95a7a842d339507e515843c466d3073b421 refs/remotes/origin/tag-attributes
+500675ec730dc6dc911cf1c716002ff888ab0eb9 refs/remotes/origin/self-closing-tags
+5cd8042040883da8fc54784a9dbf7f68bb9568b7 refs/remotes/origin/master
+fe6eb52fb2e5a18c9409b4e1e7e23f49a637f807 refs/remotes/origin/div-as-default-tag
