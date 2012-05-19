@@ -21,3 +21,5 @@
 (require 'color-theme)
 (color-theme-initialize)
 (color-theme-dark-laptop)
+
+(setq vc-follow-symlinks t)
