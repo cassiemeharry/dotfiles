@@ -1,2 +1,4 @@
 syntax: glob
 *~
+emacs.d/el-get/
+emacs.d/tramp
