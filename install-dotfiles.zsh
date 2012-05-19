@@ -12,7 +12,17 @@ abspath () {
     esac
 }
 
-dotfiles=(emacs.d gitconfig hgrc)
+dotfiles=(
+    emacs.d
+
+    gitconfig
+    hgrc
+
+    zshrc
+    zshenv
+    zprompt
+    zsh.d
+)
 
 dotfiles_dir="$(dirname $(abspath $0))"
 
@@ -25,6 +35,6 @@ for df in $dotfiles; do
         print "\e[31mWarning! \"$target\" already exists!\e[0m"
     else
         print Linking $source to $target
-        ln -s $souce $target
+        ln -s $source $target
     fi
 done

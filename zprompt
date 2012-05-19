@@ -1,0 +1,97 @@
+integer first_row_width=0
+
+promptHg () {
+    if hg status >/dev/null 2>&1; then
+	local branch=$(hg branch)
+	local revision=$(hg identify | cut -d' ' -f1)
+	print -n "── [\e[31m$branch\e[0m:\e[31m$revision\e[0m] "
+	(( first_row_width += 7 + $#branch + $#revision ))
+	if [[ $(hg status | grep '^M' | wc -l) -ne 0 ]]; then
+	    print -n "\e[41;37;1m!\e[0m "
+	    (( first_row_width += 2 ))
+	fi
+    fi
+}
+
+promptGit () {
+    if git rev-parse --git-dir >/dev/null 2>&1; then
+	local branch=$(git symbolic-ref HEAD | cut -d'/' -f3)
+	local revision=$(git rev-parse --short --verify HEAD)
+	print -n "── [\e[34;1m$branch\e[0m:\e[34;1m$revision\e[0m] "
+	(( first_row_width += 7 + $#branch + $#revision ))
+	if [[ $(git status --short --untracked-files=no | wc -l) -ne 0 ]]; then
+	    print -n "\e[44;37;1m!\e[0m "
+	    (( first_row_width += 2 ))
+        fi
+    fi
+}
+
+export VIRTUAL_ENV_DISABLE_PROMPT=yes
+promptVenv () {
+    if [[ -n $VIRTUAL_ENV ]]; then
+	local venv=$(basename $VIRTUAL_ENV)
+	print -n "── \e[33m($venv)\e[0m "
+	(( first_row_width += 6 + $#venv ))
+    fi
+}
+
+promptDate () {
+    local now="$(date +'%B %e, %I:%M %p')"
+    print -n "── $now "
+    (( first_row_width += 4 + $#now ))
+}
+
+promptCwd () {
+    local cwd=$(pwd)
+    local h=$(basename $cwd)
+    local t=$(dirname $cwd)
+    print -n "\e[0m${t}/\e[1m${h}\e[0m "
+    (( first_row_width += 2 + $#h + $#t ))
+}
+
+prompt () {
+    print '%{'
+    # First row
+    typeset tmp=$(pwd)
+    print -n "┌─── "
+    (( first_row_width += 5 ))
+    promptCwd
+    promptDate
+    promptVenv
+    promptGit
+    promptHg
+    while [[ $first_row_width -lt 28 ]]; do
+	print -n "─"
+	(( first_row_width += 1 ))
+    done
+    print "─┐"
+    (( first_row_width += 2 ))
+
+    # Second row
+    print -n "│\e[42;37;1mdr\e[0m "
+    integer second_row_width=4
+    print -n "\e[1m$USER\e[0m@"
+    (( second_row_width += $#USER + 1 ))
+    tmp=$( echo $HOST | sed 's/\..*$//' )
+    print -n "\e[32m$tmp\e[0m "
+    (( second_row_width += $#tmp + 1))
+    integer bar_width=$(( $first_row_width - $second_row_width ))
+    while [[ $bar_width > 1 ]]; do
+	print -n "─"
+	(( bar_width -= 1 ))
+    done
+    print "┘"
+
+    # Third row
+    print -n "│ "
+    if [[ $EUID == 0 ]]; then
+	print -n "\e[37;41;1m#\e[0m"
+    else
+	print -n "\e[1m$\e[0m"
+    fi
+    print -n ' %4G%}' # replace the number with the width of the last line
+}
+
+prompt2 () {
+    print -n "├── "
+}

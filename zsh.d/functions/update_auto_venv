@@ -1,0 +1,25 @@
+local venvs=~/.zsh.d/venvs
+
+if [[ -e ".venv" && -e "bin/activate" ]]; then
+    local doit=yes
+    if [[ $(grep $(pwd) $venvs | wc -l) -eq 0 ]]; then
+        print 'There is a Virtual Environment here.'
+	print -n 'Do you want to activate it? [Y/n] '
+	if read -q; then
+	    echo $(pwd) >>$venvs
+	else
+	    doit=no
+	fi
+    fi
+    if [[ $doit = yes ]]; then
+	if [[ -n $VIRTUAL_ENV && $(pwd) != "$VIRTUAL_ENV"* ]]; then
+	    print -n 'Deactivating other virtualenv... '
+	    deactivate
+	    print 'Done!'
+	fi
+	if [[ -z $VIRTUAL_ENV ]]; then
+	    source bin/activate
+	    print "Activating virtualenv $(basename $VIRTUAL_ENV)"
+	fi
+    fi
+fi
