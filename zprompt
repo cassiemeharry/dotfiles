@@ -42,11 +42,17 @@ promptDate () {
 }
 
 promptCwd () {
-    local cwd=$(pwd)
+    local cwd=$(print -P %~)
     local h=$(basename $cwd)
     local t=$(dirname $cwd)
-    print -n "\e[0m${t}/\e[1m${h}\e[0m "
-    (( first_row_width += 2 + $#h + $#t ))
+    if [[ $t == '.' || ( $t == '/' && $h == '/' ) ]]; then
+	t=''
+    elif [[ $t == '/' ]]; then
+    else
+	t=$t/
+    fi
+    print -n "\e[0m$t\e[1m$h\e[0m "
+    (( first_row_width += 1 + $#h + $#t ))
 }
 
 promptTitle () {
