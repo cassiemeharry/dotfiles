@@ -42,9 +42,9 @@ promptDate () {
 }
 
 promptCwd () {
-    local cwd=$(print -P %~)
-    local h=$(basename $cwd)
-    local t=$(dirname $cwd)
+    local cwd="$(print -P %~)"
+    local h="$(basename $cwd)"
+    local t="$(dirname $cwd)"
     if [[ $t == '.' || ( $t == '/' && $h == '/' ) ]]; then
 	t=''
     elif [[ $t == '/' ]]; then
@@ -62,7 +62,6 @@ promptTitle () {
 prompt () {
     print '%{'
     # First row
-    typeset tmp=$(pwd)
     print -n "┌─── "
     (( first_row_width += 5 ))
     promptTitle

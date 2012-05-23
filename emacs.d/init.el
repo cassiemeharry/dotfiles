@@ -23,3 +23,5 @@
 (color-theme-dark-laptop)
 
 (setq vc-follow-symlinks t)
+
+(setq ispell-program-name "aspell")
