@@ -1,2 +1,5 @@
 [ui]
 username = Nick Meharry <nick@nickmeharry.com>
+
+[extensions]
+hggit =

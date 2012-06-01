@@ -47,7 +47,7 @@ chpwd_functions+='chpwd_auto_venv'
 source ~/.zprompt
 setopt PROMPT_SUBST
 PROMPT='$(prompt)'
-PS2='$(promt2)'
+PS2='$(prompt2)'
 #PROMPT='[%B%n%b@%B%m %2~%b] %(!.#.$) '
 #RPROMPT='[%* - %W]'
 

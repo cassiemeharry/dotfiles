@@ -103,5 +103,5 @@ prompt () {
 }
 
 prompt2 () {
-    print -n "├── "
+    print -n "│ > "
 }
