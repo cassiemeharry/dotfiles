@@ -59,7 +59,4 @@ alias grep='grep --color=auto'
 alias nano='nano -w'
 alias memusage="ps -u $LOGNAME -o pid,rss,command | sort -n +1 -2"
 alias pycheck="python -m py_compile"
-
-drchrono=~/code/dc-web/drchrono-web
-: ~drchrono
-setopt CD_ABLE_VARS
+alias django="python manage.py"
