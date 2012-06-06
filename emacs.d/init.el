@@ -25,3 +25,8 @@
 (setq vc-follow-symlinks t)
 
 (setq ispell-program-name "aspell")
+
+(defun kill-all-buffers ()
+  (interactive)
+  "kill-all-buffers"
+  (mapc 'kill-buffer (buffer-list)))
