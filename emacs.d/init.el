@@ -25,6 +25,17 @@
 (setq vc-follow-symlinks t)
 
 (setq ispell-program-name "aspell")
+(global-set-key (kbd "C-c f")
+		(lambda ()
+		  (interactive)
+		  (ispell-change-dictionary "american")
+		  (flyspell-mode 1)
+		  (flyspell-buffer)))
+(global-set-key (kbd "C-c F")
+		(lambda ()
+		  (interactive)
+		  (ispell-change-dictionary "american")
+		  (flyspell-prog-mode)))
 
 (defun kill-all-buffers ()
   (interactive)
