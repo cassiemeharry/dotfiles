@@ -60,5 +60,6 @@ alias nano='nano -w'
 alias memusage="ps -u $LOGNAME -o pid,rss,command | sort -n +1 -2"
 alias pycheck="python -m py_compile"
 alias django="python manage.py"
+alias edit='emacsclient -nw --alternate-editor="" -c'
 
 source ~/.zsh.d/syntax-highlighting/zsh-syntax-highlighting.zsh
