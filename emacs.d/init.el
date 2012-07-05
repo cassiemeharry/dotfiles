@@ -70,6 +70,7 @@
 
 ;; Python Debugger/Compile
 (require 'python)
+(require 'flymake)
 (defun python--add-debug-highlight ()
   "Adds a highlighter for use by `python--pdb-breakpoint-string'"
   (highlight-lines-matching-regexp "pdb.set_trace\(\)" 'hi-red-b))
@@ -113,6 +114,10 @@ if breakpoints are present in `python-mode' files"
   (add-to-list 'flymake-allowed-file-name-masks
     '("\\.py\\'" flymake-pylint-init)))
 
-(custom-set-faces
- '(flymake-errline ((((class color)) (:underline "red"))))
- '(flymake-warnline ((((class color)) (:underline "yellow")))))
+(add-hook 'python-mode-hook
+  (lambda () (flymake-mode t)))
+
+; Underline instead of highlight
+;(custom-set-faces
+; '(flymake-errline ((((class color)) (:underline "red"))))
+; '(flymake-warnline ((((class color)) (:underline "yellow")))))
