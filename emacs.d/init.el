@@ -33,8 +33,12 @@
      (end-of-buffer)
      (eval-print-last-sexp))))
 
-(el-get 'sync)
+; Install commonly used packages
+(setq my-packages
+  '(el-get color-theme flymake-cursor markdown-mode))
+(el-get 'sync my-packages)
 
+;; Configure packages
 (defun markdown-custom ()
   "markdown-mode-hook"
   (setq markdown-command "~/.cabal/bin/pandoc --smart --from=markdown --to=html5"))
@@ -96,3 +100,19 @@ if breakpoints are present in `python-mode' files"
                                (point-max) t)
             ;; set COMINT argument to `t'.
             (ad-set-arg 1 t))))))
+
+(when (load "flymake" t)
+  (defun flymake-pylint-init ()
+    (let* ((temp-file (flymake-init-create-temp-buffer-copy
+                       'flymake-create-temp-inplace))
+       (local-file (file-relative-name
+                    temp-file
+                    (file-name-directory buffer-file-name))))
+     (list "epylint" (list local-file))))
+
+  (add-to-list 'flymake-allowed-file-name-masks
+    '("\\.py\\'" flymake-pylint-init)))
+
+(custom-set-faces
+ '(flymake-errline ((((class color)) (:underline "red"))))
+ '(flymake-warnline ((((class color)) (:underline "yellow")))))
