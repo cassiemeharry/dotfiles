@@ -2,3 +2,4 @@
 emacs.d/el-get/
 emacs.d/tramp
 ssh
+zsh.d/venvs
