@@ -19,7 +19,11 @@
 ;; Highlight selections (marks)
 (setq transient-mark-mode t)
 
+;; Watch all files and revert buffers whose backing files have changed.
+(global-auto-revert-mode t)
+
 ;; el-get
+(add-to-list 'load-path "~/.emacs.d")
 (add-to-list 'load-path "~/.emacs.d/el-get/el-get")
 
 (unless (require 'el-get nil t)
@@ -60,22 +64,35 @@
   "kill-all-buffers"
   (mapc 'kill-buffer (buffer-list)))
 
-;; Grove.io IRC
-; NickServ
-(add-hook 'erc-after-connect
-	  '(lambda (SERVER NICK)
-	     (erc-message "PRIVMSG"
-			  (concat "NickServ identify "
-				  (file-first-line "~/.emacs.d/grove-irc-password.txt")))))))
-; SSL
-(require 'tls)
-(setq tls-program
-      '("openssl s_client -connect %h:%p -no_ssl2 -ign_eof"
-        "gnutls-cli --priority secure256 -p %p %h"))
-; Grove
-(defun connect-to-grove ()
-  "Connect to Grove.io IRC"
+;; Python Debugger/Compile
+(require 'python)
+(defun python--add-debug-highlight ()
+  "Adds a highlighter for use by `python--pdb-breakpoint-string'"
+  (highlight-lines-matching-regexp "pdb.set_trace\(\)" 'hi-red-b))
+
+(add-hook 'python-mode-hook 'python--add-debug-highlight)
+
+(defvar python--pdb-breakpoint-string "import pdb; pdb.set_trace()"
+  "Python breakpoint string used by `python-insert-breakpoint'")
+
+(defun python-insert-breakpoint ()
+  "Inserts a python breakpoint using `pdb'"
   (interactive)
-  (erc-tls :server "drchrono.irc.grove.io" :port 6697
-           :nick "nickmeharry" :full-name "Nick Meharry")
-  (setq erc-autojoin-channels-alist '(("#dev" "#drchrono" "#random"))))
+  (back-to-indentation)
+  ;; this preserves the correct indentation in case the line above
+  ;; point is a nested block
+  (split-line)
+  (insert python--pdb-breakpoint-string))
+(define-key python-mode-map (kbd "<f5>") 'python-insert-breakpoint)
+
+(defadvice compile (before ad-compile-smart activate)
+  "Advises `compile' so it sets the argument COMINT to t
+if breakpoints are present in `python-mode' files"
+  (when (derived-mode-p major-mode 'python-mode)
+    (save-excursion
+      (save-match-data
+        (goto-char (point-min))
+        (if (re-search-forward (concat "^\\s-*" python--pdb-breakpoint-string "$")
+                               (point-max) t)
+            ;; set COMINT argument to `t'.
+            (ad-set-arg 1 t))))))
