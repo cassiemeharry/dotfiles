@@ -16,6 +16,7 @@ dotfiles="
     emacs.d
 
     gitconfig
+    gitignore
     hgrc
 
     zshrc

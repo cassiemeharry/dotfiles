@@ -29,3 +29,4 @@
        untracked = cyan
 [core]
 	whitespace = cr-at-eol
+	excludesfile = ~/.gitignore
