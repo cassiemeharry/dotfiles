@@ -103,7 +103,12 @@ if breakpoints are present in `python-mode' files"
             (ad-set-arg 1 t))))))
 
 (setq pylint-ignore-codes
-  '(W0201 W0203 F0401))
+  '(W0141 ; Used builtin function %r
+    W0142 ; Used * or ** magic
+    W0201 ; Attribute %r defined outside __init__
+    W0203
+    F0401 ; Unable to import %r
+    ))
 
 (when (load "flymake" t)
   (defun flymake-pylint-init ()
@@ -119,8 +124,3 @@ if breakpoints are present in `python-mode' files"
 
 (add-hook 'python-mode-hook
   (lambda () (flymake-mode t)))
-
-; Underline instead of highlight
-;(custom-set-faces
-; '(flymake-errline ((((class color)) (:underline "red"))))
-; '(flymake-warnline ((((class color)) (:underline "yellow")))))
