@@ -111,16 +111,34 @@ if breakpoints are present in `python-mode' files"
     ))
 
 (when (load "flymake" t)
+  (setq flymake-pylint-old-path nil)
   (defun flymake-pylint-init ()
     (let* ((temp-file (flymake-init-create-temp-buffer-copy
                        'flymake-create-temp-inplace))
 	   (local-file (file-relative-name
 			temp-file
-			(file-name-directory buffer-file-name))))
-      (list "epylint" (list local-file))))
-
+			(file-name-directory buffer-file-name)))
+	   (old-python-path (getenv "PYTHONPATH"))
+	   (cmd-output (process-lines "~/.emacs.d/get-django-path.sh"))
+	   )
+      (flymake-log 3 "* PYTHONPATH script success? %s" (car cmd-output))
+      (flymake-log 3 "* PYTHONPATH script output: %s" (car (cdr cmd-output)))
+      (if (string= (car cmd-output) "Y")
+	  (progn
+	    (flymake-log 3 "setting PYTHONPATH from %s to %s" old-python-path (car (cdr cmd-output)))
+	    (setq flymake-pylint-old-path old-python-path)
+	    (setenv "PYTHONPATH" (car (cdr cmd-output))))
+	(flymake-log 2 "** ERROR setting PYTHONPATH: %s" % (car (cdr cmd-output))))
+      (list "epylint" (list buffer-file-name))))
+  (defun flymake-pylint-cleanup ()
+    (if flymake-pylint-old-path
+        (progn
+	  (flymake-log 3 "cleaning up temporary PYTHONPATH")
+	  (setenv "PYTHONPATH" flymake-pylint-old-path)
+	  (setq flymake-pylint-old-path nil))
+      (setenv "PYTHONPATH" nil)))
   (add-to-list 'flymake-allowed-file-name-masks
-    '("\\.py\\'" flymake-pylint-init)))
+    '("\\.py\\'" flymake-pylint-init flymake-pylint-cleanup)))
 
 (add-hook 'python-mode-hook
   (lambda () (flymake-mode t)))
