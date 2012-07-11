@@ -102,14 +102,6 @@ if breakpoints are present in `python-mode' files"
             ;; set COMINT argument to `t'.
             (ad-set-arg 1 t))))))
 
-(setq pylint-ignore-codes
-  '(W0141 ; Used builtin function %r
-    W0142 ; Used * or ** magic
-    W0201 ; Attribute %r defined outside __init__
-    W0203
-    F0401 ; Unable to import %r
-    ))
-
 (when (load "flymake" t)
   (setq flymake-pylint-old-path nil)
   (defun flymake-pylint-init ()

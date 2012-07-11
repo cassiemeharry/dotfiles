@@ -19,6 +19,8 @@ dotfiles="
     gitignore
     hgrc
 
+    pylintrc
+
     zshrc
     zshenv
     zprompt
