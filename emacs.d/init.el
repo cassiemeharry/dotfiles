@@ -132,5 +132,12 @@ if breakpoints are present in `python-mode' files"
   (add-to-list 'flymake-allowed-file-name-masks
     '("\\.py\\'" flymake-pylint-init flymake-pylint-cleanup)))
 
+(eval-after-load "flymake"
+  '(progn
+     (defun flymake-after-change-function (start stop len)
+       "Start syntax check for current buffer if it isn't already running."
+       ;; Only run on save, as my pylint script takes too long and is synchronous.
+       )))
+
 (add-hook 'python-mode-hook
   (lambda () (flymake-mode t)))
