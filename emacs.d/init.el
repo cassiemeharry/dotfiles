@@ -128,7 +128,8 @@ if breakpoints are present in `python-mode' files"
 	  (flymake-log 3 "cleaning up temporary PYTHONPATH")
 	  (setenv "PYTHONPATH" flymake-pylint-old-path)
 	  (setq flymake-pylint-old-path nil))
-      (setenv "PYTHONPATH" nil)))
+      (setenv "PYTHONPATH" nil))
+    (flymake-simple-cleanup))
   (add-to-list 'flymake-allowed-file-name-masks
     '("\\.py\\'" flymake-pylint-init flymake-pylint-cleanup)))
 
