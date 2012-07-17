@@ -16,6 +16,10 @@
   "Read the first line from a file. Handy for passwords."
   (chomp (car (file-lines file))))
 
+;; Disable backgrounding emacs with C-z.
+(global-unset-key [(control z)])
+(global-unset-key [(control x)(control z)])
+
 ;; Highlight selections (marks)
 (setq transient-mark-mode t)
 
