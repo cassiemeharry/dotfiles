@@ -26,6 +26,11 @@
 ;; Watch all files and revert buffers whose backing files have changed.
 (global-auto-revert-mode t)
 
+;; Cursor position helpers
+(setq linum-format "%4d ")
+(global-linum-mode t)
+(column-number-mode t)
+
 ;; el-get
 (add-to-list 'load-path "~/.emacs.d")
 (add-to-list 'load-path "~/.emacs.d/el-get/el-get")
@@ -146,6 +151,7 @@ if breakpoints are present in `python-mode' files"
 
 (add-hook 'python-mode-hook
   (lambda () (flymake-mode t)))
+
 (custom-set-variables
   ;; custom-set-variables was added by Custom.
   ;; If you edit it by hand, you could mess it up, so be careful.
