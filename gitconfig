@@ -5,6 +5,7 @@
 [alias]
 	glog = log --graph --all --decorate --dense --pretty=short --date=local
 	alias = config --get-regexp 'alias\\..+'
+	co = checkout
 
 [color]
 	branch = auto
