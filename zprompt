@@ -42,6 +42,7 @@ promptDate () {
 }
 
 promptCwd () {
+    local pwd=$(pwd)
     local cwd="$(print -P %~)"
     local h="$(basename $cwd)"
     local t="$(dirname $cwd)"
@@ -49,7 +50,19 @@ promptCwd () {
 	t=''
     elif [[ $t == '/' ]]; then
     else
-	t=$t/
+	t="$t/"
+    fi
+    if [[ -n $VIRTUAL_ENV && $pwd == $VIRTUAL_ENV* ]]; then
+        t="\e[33m...\e[0m"
+        if [[ $pwd != $VIRTUAL_ENV ]]; then
+            t+=$(dirname $(echo $pwd | sed "s#$VIRTUAL_ENV##"))
+	    if [[ ! $t == */ ]]; then
+		t+="/"
+	    fi
+	else
+	    h=""
+	fi
+	(( first_row_width -= 11 ))
     fi
     print -n "\e[0m$t\e[1m$h\e[0m "
     (( first_row_width += 1 + $#h + $#t ))
