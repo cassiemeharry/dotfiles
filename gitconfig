@@ -31,3 +31,5 @@
 [core]
 	whitespace = cr-at-eol
 	excludesfile = ~/.gitignore
+[branch]
+	autosetuprebase = always
