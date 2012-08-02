@@ -1,5 +1,14 @@
 integer first_row_width=0
 
+promptMail () {
+    if ! mail -e; then
+        return
+    fi
+    count=$[$(mail -H | wc -l) - 2]
+    print -n "── [\e[35;1mmail\e[0m:\e[35;1m$count\e[0m] "
+    (( first_row_width += 11 + $#count ))
+}
+
 promptHg () {
     if hg status >/dev/null 2>&1; then
 	local branch=$(hg branch)
@@ -80,6 +89,7 @@ prompt () {
     promptTitle
     promptCwd
     promptDate
+    promptMail
     promptVenv
     promptGit
     promptHg
