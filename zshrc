@@ -38,7 +38,9 @@ bindkey -e
 autoload -U colors
 colors
 
-source ~/.zshenv
+if [ -e ~/.zshenv ]; then
+    source ~/.zshenv
+fi
 
 fpath=(~/.zsh.d/functions $fpath)
 autoload -U ~/.zsh.d/functions/*(:t)
