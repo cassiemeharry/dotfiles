@@ -66,5 +66,13 @@ alias memusage="ps -u $LOGNAME -o pid,rss,command | sort -n +1 -2"
 alias pycheck="python -m py_compile"
 alias django="python manage.py"
 alias edit='emacsclient -nw --alternate-editor="" -c'
+function git-sync () {
+    local branch="$(git symbolic-ref HEAD 2>/dev/null | cut -d'/' -f3)"
+    local remote="$(git config branch.$branch.remote)"
+    git stash
+    git pull --rebase $remote $branch
+    git push $remote $branch
+    git stash apply
+}
 
 source ~/.zsh.d/syntax-highlighting/zsh-syntax-highlighting.zsh
