@@ -53,9 +53,11 @@
   (setq markdown-command "~/.cabal/bin/pandoc --smart --from=markdown --to=html5"))
 (add-hook 'markdown-mode-hook '(lambda () (markdown-custom)))
 
-(require 'color-theme)
-(color-theme-initialize)
-(color-theme-dark-laptop)
+;; (require 'color-theme)
+;; (color-theme-initialize)
+;; (color-theme-dark-laptop)
+
+(load-theme 'tango-dark t)
 
 (setq vc-follow-symlinks t)
 
@@ -151,16 +153,3 @@ if breakpoints are present in `python-mode' files"
 
 (add-hook 'python-mode-hook
   (lambda () (flymake-mode t)))
-
-(custom-set-variables
-  ;; custom-set-variables was added by Custom.
-  ;; If you edit it by hand, you could mess it up, so be careful.
-  ;; Your init file should contain only one such instance.
-  ;; If there is more than one, they won't work right.
- )
-(custom-set-faces
-  ;; custom-set-faces was added by Custom.
-  ;; If you edit it by hand, you could mess it up, so be careful.
-  ;; Your init file should contain only one such instance.
-  ;; If there is more than one, they won't work right.
- '(linum ((t (:inherit (shadow default) :background "color-102" :foreground "yellow")))))
