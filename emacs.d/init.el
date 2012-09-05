@@ -30,6 +30,7 @@
 (setq linum-format "%4d ")
 (global-linum-mode t)
 (column-number-mode t)
+(setq scroll-error-top-bottom 'true)
 
 ;; el-get
 (add-to-list 'load-path "~/.emacs.d")
@@ -72,7 +73,8 @@
 		(lambda ()
 		  (interactive)
 		  (ispell-change-dictionary "american")
-		  (flyspell-prog-mode)))
+		  (flyspell-prog-mode)
+		  (flyspell-buffer)))
 
 (defun kill-all-buffers ()
   (interactive)
