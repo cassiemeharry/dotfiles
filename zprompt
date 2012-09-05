@@ -24,7 +24,7 @@ promptHg () {
 
 promptGit () {
     if git rev-parse --git-dir >/dev/null 2>&1; then
-	local branch=$(git symbolic-ref HEAD 2>/dev/null | cut -d'/' -f3)
+	local branch=$(git symbolic-ref HEAD 2>/dev/null | cut -d'/' -f3-)
 	local revision=$(git rev-parse --short --verify HEAD)
 	print -n "── [\e[34;1m$branch\e[0m:\e[34;1m$revision\e[0m] "
 	(( first_row_width += 7 + $#branch + $#revision ))
