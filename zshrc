@@ -53,8 +53,7 @@ source ~/.zprompt
 setopt PROMPT_SUBST
 PROMPT='$(prompt)'
 PS2='$(prompt2)'
-#PROMPT='[%B%n%b@%B%m %2~%b] %(!.#.$) '
-#RPROMPT='[%* - %W]'
+RPROMPT='$(rprompt)'
 
 # Aliases
 alias ls='ls -G'

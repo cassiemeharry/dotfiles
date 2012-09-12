@@ -108,6 +108,10 @@ prompt () {
     tmp=$( echo $HOST | sed 's/\..*$//' )
     print -n "\e[32m$tmp\e[0m "
     (( second_row_width += $#tmp + 1))
+    local history_number='%!'
+    print -n "── [\e[36m$history_number\e[0m] "
+    (( second_row_width += 6 ))
+    (( second_row_width += $#history_number ))
     integer bar_width=$(( $first_row_width - $second_row_width ))
     while [[ $bar_width > 1 ]]; do
 	print -n "─"
@@ -116,7 +120,9 @@ prompt () {
     print "┘"
 
     # Third row
-    print -n "│ "
+    print -n "└ "
+    integer third_row_width=13
+    (( third_row_width += $#history_number ))
     if [[ $EUID == 0 ]]; then
 	print -n "\e[37;41;1m#\e[0m"
     else
@@ -127,4 +133,13 @@ prompt () {
 
 prompt2 () {
     print -n "│ > "
+}
+
+rprompt () {
+    local last_status=$?
+    if [[ $last_status != 0 ]]; then
+        local current='%!'
+        integer last=${(%)current}-1
+        print "%F{cyan}$last%F{red} failed with status %B${last_status}%b"
+    fi
 }
