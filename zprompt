@@ -1,7 +1,7 @@
 integer first_row_width=0
 
 promptMail () {
-    if ! mail -e; then
+    if ! which mail 2>&1 >/dev/null || ! mail -e; then
         return
     fi
     count=$[$(mail -H | wc -l) - 2]
@@ -23,6 +23,9 @@ promptHg () {
 }
 
 promptGit () {
+    if ! which git 2>&1 >/dev/null; then;
+        return
+    fi
     if git rev-parse --git-dir >/dev/null 2>&1; then
 	local branch=$(git symbolic-ref HEAD 2>/dev/null | cut -d'/' -f3-)
 	local revision=$(git rev-parse --short --verify HEAD)
