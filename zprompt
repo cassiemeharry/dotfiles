@@ -1,57 +1,17 @@
-integer first_row_width=0
+# Nick's Fancy Prompt
+#
+# This prompt is modular, meaning that new segments simply need to be
+# functions that print their output and be added to either `firstRow'
+# or `secondRow'.
+#
+# For example:
+#     myPromptExtra () {
+#         print "I'm in your prompt, widening your terminal"
+#     }
+#     firstRow+=(myPromptExtra)
+#
 
-promptMail () {
-    if ! which mail 2>&1 >/dev/null || ! mail -e; then
-        return
-    fi
-    count=$[$(mail -H | wc -l) - 2]
-    print -n "── [\e[35;1mmail\e[0m:\e[35;1m$count\e[0m] "
-    (( first_row_width += 11 + $#count ))
-}
-
-promptHg () {
-    if hg status >/dev/null 2>&1; then
-	local branch=$(hg branch)
-	local revision=$(hg identify | cut -d' ' -f1)
-	print -n "── [\e[31m$branch\e[0m:\e[31m$revision\e[0m] "
-	(( first_row_width += 7 + $#branch + $#revision ))
-	if [[ $(hg status | grep '^M' | wc -l) -ne 0 ]]; then
-	    print -n "\e[41;37;1m!\e[0m "
-	    (( first_row_width += 2 ))
-	fi
-    fi
-}
-
-promptGit () {
-    if ! which git 2>&1 >/dev/null; then;
-        return
-    fi
-    if git rev-parse --git-dir >/dev/null 2>&1; then
-	local branch=$(git symbolic-ref HEAD 2>/dev/null | cut -d'/' -f3-)
-	local revision=$(git rev-parse --short --verify HEAD)
-	print -n "── [\e[34;1m$branch\e[0m:\e[34;1m$revision\e[0m] "
-	(( first_row_width += 7 + $#branch + $#revision ))
-	if [[ $(git status --short --untracked-files=no | wc -l) -ne 0 ]]; then
-	    print -n "\e[44;37;1m!\e[0m "
-	    (( first_row_width += 2 ))
-        fi
-    fi
-}
-
-export VIRTUAL_ENV_DISABLE_PROMPT=yes
-promptVenv () {
-    if [[ -n $VIRTUAL_ENV ]]; then
-	local venv=$(basename $VIRTUAL_ENV)
-	print -n "── \e[33m($venv)\e[0m "
-	(( first_row_width += 6 + $#venv ))
-    fi
-}
-
-promptDate () {
-    local now="$(date +'%B %e, %I:%M %p')"
-    print -n "── $now "
-    (( first_row_width += 4 + $#now ))
-}
+local -aU first_row_functions second_row_functions
 
 promptCwd () {
     local pwd=$(pwd)
@@ -59,79 +19,161 @@ promptCwd () {
     local h="$(basename $cwd)"
     local t="$(dirname $cwd)"
     if [[ $t == '.' || ( $t == '/' && $h == '/' ) ]]; then
-	t=''
+        t=''
     elif [[ $t == '/' ]]; then
     else
-	t="$t/"
+        t="$t/"
     fi
     if [[ -n $VIRTUAL_ENV && $pwd == $VIRTUAL_ENV* ]]; then
         t="\e[33m...\e[0m"
         if [[ $pwd != $VIRTUAL_ENV ]]; then
             t+=$(dirname $(echo $pwd | sed "s#$VIRTUAL_ENV##"))
-	    if [[ ! $t == */ ]]; then
-		t+="/"
-	    fi
-	else
-	    h=""
-	fi
-	(( first_row_width -= 11 ))
+            if [[ ! $t == */ ]]; then
+                t+="/"
+            fi
+        else
+            h=""
+        fi
+        (( first_row_width -= 11 ))
     fi
-    print -n "\e[0m$t\e[1m$h\e[0m "
-    (( first_row_width += 1 + $#h + $#t ))
+    print "\e[0m$t\e[1m$h\e[0m"
+}
+first_row_functions+=(promptCwd)
+
+promptDate () {
+    date +'%B %e, %I:%M %p'
+}
+first_row_functions+=(promptDate)
+
+export VIRTUAL_ENV_DISABLE_PROMPT=yes
+promptVenv () {
+    if [[ -n $VIRTUAL_ENV ]]; then
+        local venv=$(basename $VIRTUAL_ENV)
+        print "\e[33m($venv)\e[0m"
+    fi
+}
+first_row_functions+=(promptVenv)
+
+promptHg () {
+    if hg status >/dev/null 2>&1; then
+        local branch=$(hg branch)
+        local revision=$(hg identify | cut -d' ' -f1)
+        print -n "[\e[31m$branch\e[0m:\e[31m$revision\e[0m]"
+        if [[ $(hg status | grep '^M' | wc -l) -ne 0 ]]; then
+            print " \e[41;37;1m!\e[0m"
+	else
+	    print ""
+        fi
+    fi
+}
+first_row_functions+=(promptHg)
+
+promptGit () {
+    if ! which git 2>&1 >/dev/null; then;
+        return
+    fi
+    if git rev-parse --git-dir >/dev/null 2>&1; then
+        local branch=$(git symbolic-ref HEAD 2>/dev/null | cut -d'/' -f3-)
+        local revision=$(git rev-parse --short --verify HEAD)
+        print -n "[\e[34;1m$branch\e[0m:\e[34;1m$revision\e[0m]"
+        (( first_row_width += 7 + $#branch + $#revision ))
+        if [[ $(git status --short --untracked-files=no | wc -l) -ne 0 ]]; then
+            print " \e[44;37;1m!\e[0m"
+        else
+            print ""
+	fi
+    fi
+}
+first_row_functions+=(promptGit)
+
+promptDr () {
+    if [[ "$(hostname)" =~ "drchrono" ]]; then
+	print "\e[42;37;1mdr\e[0m"
+    fi
+}
+second_row_functions+=(promptDr)
+
+promptUserHost () {
+    print -P "\e[1m%n\e[0m@\e[32m%m\e[0m"
+}
+second_row_functions+=(promptUserHost)
+
+promptMail () {
+    if ! mail -e; then
+        return
+    fi
+    count=$[$(mail -H | wc -l) - 2]
+    print "[\e[35;1mmail\e[0m:\e[35;1m$count\e[0m]"
+}
+second_row_functions+=(promptMail)
+
+promptHistoryNumber () {
+    print -P "[\e[36m%!\e[0m]"
+}
+second_row_functions+=(promptHistoryNumber)
+
+promptPrompt () { # :)
+    if [[ $EUID == 0 ]]; then
+        print "\e[37;41;1m#\e[0m"
+    else
+        print "\e[1m$\e[0m"
+    fi
 }
 
-promptTitle () {
-    print -Pn "%{\e]2;%n@%m: %~\a%}"
+perceivedLength () {
+    local noColors
+    [[ -n $2 ]] && echo "before: \"$1\" $#1" >&2
+    noColors=$(print "$1" | python -c "import re, sys; sys.stdout.write(re.sub('\x1b\[.*?m','',sys.stdin.read()))")
+    [[ -n $2 ]] && echo "after:  \"$noColors\" $#noColors" >&2
+    echo $#noColors
 }
 
 prompt () {
-    print '%{'
-    # First row
-    print -n "┌─── "
-    (( first_row_width += 5 ))
-    promptTitle
-    promptCwd
-    promptDate
-    promptMail
-    promptVenv
-    promptGit
-    promptHg
-    while [[ $first_row_width -lt 28 ]]; do
-	print -n "─"
-	(( first_row_width += 1 ))
-    done
-    print "─┐"
-    (( first_row_width += 2 ))
+    [[ $(perceivedLength "\e[36mCyan\e[m") -ne 4 ]] && echo "perceivedLength is wrong! $ " && return
+    local first_row="┌── " second_row="│" third_row="└ " current=""
+    integer first_row_length second_row_length third_row_length
 
-    # Second row
-    print -n "│\e[42;37;1mdr\e[0m "
-    integer second_row_width=4
-    print -n "\e[1m$USER\e[0m@"
-    (( second_row_width += $#USER + 1 ))
-    tmp=$( echo $HOST | sed 's/\..*$//' )
-    print -n "\e[32m$tmp\e[0m "
-    (( second_row_width += $#tmp + 1))
-    local history_number='%!'
-    print -n "── [\e[36m$history_number\e[0m] "
-    (( second_row_width += 6 ))
-    (( second_row_width += $#history_number ))
-    integer bar_width=$(( $first_row_width - $second_row_width ))
-    while [[ $bar_width > 1 ]]; do
-	print -n "─"
-	(( bar_width -= 1 ))
+    for func in $first_row_functions; do
+        current=$($func | tr -d '\n')
+        if [[ -n $current ]]; then
+            [[ $func != $first_row_functions[1] ]] && first_row+="── "
+            first_row+=$current
+            first_row+=" "
+        fi
     done
-    print "┘"
+    first_row_length=$(perceivedLength $first_row)
+    first_row_length+=-2
 
-    # Third row
-    print -n "└ "
-    integer third_row_width=13
-    (( third_row_width += $#history_number ))
-    if [[ $EUID == 0 ]]; then
-	print -n "\e[37;41;1m#\e[0m"
-    else
-	print -n "\e[1m$\e[0m"
-    fi
-    print -n ' %4G%}' # replace the number with the width of the last line
+    for func in $second_row_functions; do
+	current=$($func | tr -d '\n')
+	if [[ -n $current ]]; then
+	    [[ $func != $second_row_functions[1] ]] && second_row+="── "
+            second_row+=$current
+            second_row+=" "
+        fi
+    done
+    second_row_length=$(perceivedLength $second_row)
+    second_row_length+=-2
+
+    while (( $first_row_length < $second_row_length )); do
+	first_row+="─"
+	(( first_row_length += 1 ))
+    done
+    while (( $first_row_length > $second_row_length )); do
+	second_row+="─"
+	(( second_row_length += 1 ))
+    done
+
+    first_row+="─┐"
+    second_row+="─┘"
+
+    third_row+=$(promptPrompt | tr -d '\n')
+    third_row+=" %$(perceivedLength $third_row)G%}"
+
+    print -n "%{"
+    print $first_row
+    print $second_row
+    print $third_row
 }
 
 prompt2 () {
