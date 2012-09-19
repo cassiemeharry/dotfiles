@@ -19,6 +19,7 @@ dotfiles="
     gitignore
     hgrc
 
+    ackrc
     pylintrc
 
     zshrc
