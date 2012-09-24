@@ -170,7 +170,7 @@ prompt () {
     third_row+=$(promptPrompt | tr -d '\n')
     third_row+="%$(perceivedLength $third_row)G%} "
 
-    print -n "%{"
+    print "%{"
     print $first_row
     print $second_row
     print $third_row
