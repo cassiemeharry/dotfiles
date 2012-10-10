@@ -14,10 +14,10 @@
 local -aU first_row_functions second_row_functions
 
 promptCwd () {
-    local pwd=$(pwd)
+    local pwd="$(pwd)"
     local cwd="$(print -P %~)"
-    local h="$(basename $cwd)"
-    local t="$(dirname $cwd)"
+    local h="$(basename "$cwd")"
+    local t="$(dirname "$cwd")"
     if [[ $t == '.' || ( $t == '/' && $h == '/' ) ]]; then
         t=''
     elif [[ $t == '/' ]]; then
