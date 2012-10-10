@@ -59,6 +59,7 @@
 ;; (color-theme-dark-laptop)
 
 (require 'rust-mode)
+(require 'web-mode)
 
 (load-theme 'tango-dark t)
 
