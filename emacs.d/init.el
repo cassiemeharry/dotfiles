@@ -58,6 +58,8 @@
 ;; (color-theme-initialize)
 ;; (color-theme-dark-laptop)
 
+(require 'rust-mode)
+
 (load-theme 'tango-dark t)
 
 (setq vc-follow-symlinks t)
