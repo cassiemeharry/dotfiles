@@ -1,4 +1,5 @@
 *~
+*.elc
 emacs.d/el-get/
 emacs.d/tramp
 ssh

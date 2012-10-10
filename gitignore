@@ -1,7 +1,10 @@
 # Python Extras
-*.pyc
 *_flymake.py
 
 # Emacs backup files
 *~
 [#]*[#]
+
+# Compiled files
+*.pyc
+*.elc
