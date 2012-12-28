@@ -170,6 +170,9 @@
 ;;        ;; Only run on save, as my pylint script takes too long and is synchronous.
 ;;        )))
 
+(add-to-list 'load-path "~/.emacs.d/elixir-mode")
+(require 'elixir-mode)
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
