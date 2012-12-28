@@ -42,7 +42,7 @@
       "http://marmalade-repo.org/packages/"))
 (package-initialize)
 (defvar my-packages ; color-theme and color-theme-tango should be in this list as well
-  '(flymake flymake-cursor haste markdown-mode rust-mode))
+  '(flymake flymake-cursor haste markdown-mode rust-mode tuareg))
 (defun my-packages-installed-p ()
   (let (all-installed 't)
     (dolist (p my-packages)
