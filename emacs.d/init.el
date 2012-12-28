@@ -63,7 +63,8 @@
   "markdown-mode-hook"
   (setq markdown-command "~/.cabal/bin/pandoc --smart --from=markdown --to=html5")
   (auto-fill-mode))
-(add-hook 'markdown-mode-hook '(lambda () (markdown-custom)))
+(if (file-exists-p "~/.cabal/bin/pandoc")
+    (add-hook 'markdown-mode-hook '(lambda () (markdown-custom))))
 
 ; Rust mode
 ;   Rust is a new systems language from Mozilla.
