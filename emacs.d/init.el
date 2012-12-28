@@ -78,8 +78,6 @@
 (add-to-list 'auto-mode-alist '("\\.html$" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.htm$" . web-mode))
 
-(load-theme 'tango-dark t)
-
 (setq vc-follow-symlinks t)
 
 ; Flyspell
