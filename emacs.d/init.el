@@ -41,6 +41,7 @@
 (global-linum-mode t)
 (column-number-mode t)
 (setq scroll-error-top-bottom 'true)
+(load-theme 'tango-dark t)
 
 ;; Package Management
 (require 'package)
