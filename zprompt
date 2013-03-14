@@ -181,10 +181,16 @@ prompt2 () {
 }
 
 rprompt () {
-    local last_status=$?
+    local last_status="$pipestatus"
+    local command_count="${#last_status}"
+    if [[ $command_count > 1 ]]; then
+        local plural="es"
+    else
+        local plural=""
+    fi
     if [[ $last_status != 0 ]]; then
         local current='%!'
         integer last=${(%)current}-1
-        print "%F{cyan}$last%F{red} failed with status %B${last_status}%b"
+        print "%F{cyan}$last%F{red} failed with status$plural %B${last_status}%b"
     fi
 }
