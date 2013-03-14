@@ -9,6 +9,13 @@
     (setq str (replace-match "" t t str)))
   str)
 
+(defun all (predicate lst)
+  "Return either 't or 'nil whether all items in a list pass a given predicate"
+  (cond ((null lst) 't)
+        ('t (if (funcall predicate (car lst))
+                (all predicate (cdr lst))
+              'nil))))
+
 (defun file-lines (file)
   "Read a file and return lines as a list."
   (with-temp-buffer
@@ -44,19 +51,20 @@
 (defvar my-packages ; color-theme and color-theme-tango should be in this list as well
   '(flymake flymake-cursor haste markdown-mode rust-mode tuareg))
 (defun my-packages-installed-p ()
-  (let (all-installed 't)
-    (dolist (p my-packages)
-      (if (not (package-installed-p p))
-	  (setq all-installed nil)))
-    all-installed))
+  (all 'package-installed-p my-packages))
+
 ; Install packages not currently installed
-(unless (my-packages-installed-p)
-  (message "%s" "Refreshing package database...")
+(if (my-packages-installed-p)
+    (message "All packages installed")
+  (message "* Refreshing package database...")
   (package-refresh-contents)
-  (message "%s" "done.")
+  (message "* Done refreshing package database")
   (dolist (p my-packages)
     (when (not (package-installed-p p))
-      (package-install p))))
+      (progn
+        (message (format "  * Installing package %s..." (symbol-name p)))
+        (package-install p)
+        (message "  * Done installing package")))))
 
 ;; Configure packages
 (defun markdown-custom ()
