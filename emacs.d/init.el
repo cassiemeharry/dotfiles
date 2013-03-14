@@ -47,9 +47,12 @@
 (add-to-list 'package-archives
     '("marmalade" .
       "http://marmalade-repo.org/packages/"))
+(add-to-list 'package-archives
+    '("melpa" .
+      "http://melpa.milkbox.net/packages/"))
 (package-initialize)
-(defvar my-packages ; color-theme and color-theme-tango should be in this list as well
-  '(flymake flymake-cursor haste markdown-mode rust-mode tuareg))
+(defvar my-packages
+  '(flymake flymake-cursor haste markdown-mode multiple-cursors rainbow-mode rust-mode tuareg zencoding-mode))
 (defun my-packages-installed-p ()
   (all 'package-installed-p my-packages))
 
@@ -80,11 +83,22 @@
 (autoload 'rust-mode "rust-mode" "Major mode for the Rust language" t)
 (add-to-list 'auto-mode-alist '("\\.rs$" . rust-mode))
 
+; Jinja2 mode
+;   A templating language that's almost like the Django Template Language
+;   Also good enough for HL7
+(autoload 'jinja2-mode "jinja2-mode" "Major mode for the Jinja2 Template Language" t)
+(add-to-list 'auto-mode-alist '("\\.hl7$" . 'jinja2-mode))
+
 ; Web mode
 ;   Combines HTML, CSS, and JS modes in a reletively sane manner.
 (autoload 'web-mode "web-mode" "Major mode for HTML5/JS/CSS" t)
 (add-to-list 'auto-mode-alist '("\\.html$" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.htm$" . web-mode))
+
+(require 'multiple-cursors)
+(global-set-key (kbd "M-N") 'mc/mark-next-like-this)
+(global-set-key (kbd "M-P") 'mc/mark-previous-like-this)
+(global-set-key (kbd "C-c C-SPC") 'mc/mark-all-like-this)
 
 (setq vc-follow-symlinks t)
 
