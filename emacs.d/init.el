@@ -53,7 +53,7 @@
       "http://melpa.milkbox.net/packages/"))
 (package-initialize)
 (defvar my-packages
-  '(flymake flymake-cursor haste markdown-mode multiple-cursors rainbow-mode rust-mode tuareg zencoding-mode))
+  '(flymake flymake-cursor haste markdown-mode multiple-cursors python-mode rainbow-mode rust-mode tuareg zencoding-mode))
 (defun my-packages-installed-p ()
   (all 'package-installed-p my-packages))
 
@@ -71,6 +71,11 @@
         (message "  * Done installing package")))))
 
 ;; Configure packages
+(let ((elpa-dir "~/.emacs.d/elpa/") ; Hack to load the correct python-mode
+      (pm-dir (car (directory-files elpa-dir nil "python-mode-.+")))
+      (python-mode.el (concat elpa-dir pm-dir "/python-mode.el")))
+  (load python-mode.el))
+
 (defun markdown-custom ()
   "markdown-mode-hook"
   (setq markdown-command "~/.cabal/bin/pandoc --smart --from=markdown --to=html5")
