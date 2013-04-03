@@ -204,13 +204,13 @@
     (progn
       (require 'xterm-frobs)
       (defun my-xterm-title-hook ()
-        (if (not (minibufferp (buffer-name)))
-            (let ((title
+        (if (buffer-file-name)
+            (let* ((filename (mapconcat 'identity (last (split-string (buffer-file-name) "/") 2) "/"))
+                  (title
                    (concat
                     (cond (buffer-read-only "%  ")
                           ((buffer-modified-p) "*  "))
-                    (buffer-name)
-                    "  (" invocation-name "@" system-name ")")))
+                    filename)))
               (progn
                 (xterm-set-window-title title)
                 (xterm-set-icon-title title)))))
