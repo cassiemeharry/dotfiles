@@ -200,6 +200,27 @@
 (add-to-list 'load-path "~/.emacs.d/elixir-mode")
 (require 'elixir-mode)
 
+(if (not window-system)
+    (progn
+      (require 'xterm-frobs)
+      (defun my-xterm-title-hook ()
+        (if (not (minibufferp (buffer-name)))
+            (let ((title
+                   (concat
+                    (cond (buffer-read-only "%  ")
+                          ((buffer-modified-p) "*  "))
+                    (buffer-name)
+                    "  (" invocation-name "@" system-name ")")))
+              (progn
+                (xterm-set-window-title title)
+                (xterm-set-icon-title title)))))
+      (add-hook 'post-command-hook  'my-xterm-title-hook))
+  (setq frame-title-format
+        '(""
+          (:eval (cond (buffer-read-only "%%  ")
+                       ((buffer-modified-p) "*  ")))
+          "%b  (" invocation-name "@" system-name ")")))
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
