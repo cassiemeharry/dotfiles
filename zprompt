@@ -11,7 +11,16 @@
 #     firstRow+=(myPromptExtra)
 #
 
-local -aU first_row_functions second_row_functions
+local -aU first_row_functions second_row_functions aux_functions
+
+promptTitle () {
+    if [[ -n $VIRTUAL_ENV ]]; then
+        print "\e]1;($(basename $VIRTUAL_ENV)) $(basename $(pwd))\a"
+    else
+        print -P "\e]1;%~\a"
+    fi
+}
+aux_functions+=(promptTitle)
 
 promptCwd () {
     local pwd="$(pwd)"
@@ -132,6 +141,10 @@ prompt () {
     [[ $(perceivedLength "\e[36mCyan\e[m") -ne 4 ]] && echo "perceivedLength is wrong! $ " && return
     local first_row="┌── " second_row="│" third_row="└ " current=""
     integer first_row_length second_row_length third_row_length
+
+    for func in $aux_functions; do
+        $func
+    done
 
     for func in $first_row_functions; do
         current=$($func | tr -d '\n')
