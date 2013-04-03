@@ -43,6 +43,9 @@
 (setq scroll-error-top-bottom 'true)
 (load-theme 'tango-dark t)
 
+;; Load remote files over SSH
+(setq tramp-default-method "ssh")
+
 ;; Package Management
 (require 'package)
 (add-to-list 'package-archives
@@ -71,7 +74,7 @@
         (message "  * Done installing package")))))
 
 ;; Configure packages
-(let ((elpa-dir "~/.emacs.d/elpa/") ; Hack to load the correct python-mode
+(let* ((elpa-dir "~/.emacs.d/elpa/") ; Hack to load the correct python-mode
       (pm-dir (car (directory-files elpa-dir nil "python-mode-.+")))
       (python-mode.el (concat elpa-dir pm-dir "/python-mode.el")))
   (load python-mode.el))
@@ -93,7 +96,7 @@
 ;   A templating language that's almost like the Django Template Language
 ;   Also good enough for HL7
 (autoload 'jinja2-mode "jinja2-mode" "Major mode for the Jinja2 Template Language" t)
-(add-to-list 'auto-mode-alist '("\\.hl7$" . 'jinja2-mode))
+(add-to-list 'auto-mode-alist '("\\.hl7$" . jinja2-mode))
 
 ; Web mode
 ;   Combines HTML, CSS, and JS modes in a reletively sane manner.
