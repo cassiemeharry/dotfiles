@@ -36,6 +36,9 @@
 ;; Watch all files and revert buffers whose backing files have changed.
 (global-auto-revert-mode t)
 
+;; Start in *scratch* instead of the splash screen
+(setq inhibit-splash-screen t)
+
 ;; Cursor position helpers
 (setq linum-format "%4d ")
 (global-linum-mode t)
@@ -79,6 +82,13 @@
       (python-mode.el (concat elpa-dir pm-dir "/python-mode.el")))
   (load python-mode.el))
 
+(defun after-change-major-mode-hook ()
+  "Sets the underscore character as a word boundary, so M-f and friends stop on it"
+  (let* ((mode (symbol-name major-mode))
+        (table (intern (concat mode "-syntax-table"))))
+    (if (boundp table)
+        (modify-syntax-entry ?_ "." (symbol-value table)))))
+
 (defun markdown-custom ()
   "markdown-mode-hook"
   (setq markdown-command "~/.cabal/bin/pandoc --smart --from=markdown --to=html5")
@@ -110,6 +120,29 @@
 (global-set-key (kbd "C-c C-SPC") 'mc/mark-all-like-this)
 
 (setq vc-follow-symlinks t)
+
+(require 'ido)
+(ido-mode t)
+
+; Recent files
+(require 'recentf)
+(setq recentf-max-saved-items 200
+      recentf-max-menu-items 15)
+(recentf-mode t)
+
+(defun recentf-ido-find-file ()
+  "Find a recent file using ido."
+  (interactive)
+  (let ((file (ido-completing-read "Choose recent file: " recentf-list nil t)))
+    (when file
+      (find-file file))))
+
+(global-set-key (kbd "C-c f") 'recentf-ido-find-file)
+
+; Let emacs "zone out" after a while
+(require 'zone)
+(setq zone-after-minutes 5)
+(zone-when-idle (* zone-after-minutes 60))
 
 ; Flyspell
 ;   Check my spelling while editing both text (C-c f) and code (C-c F).
@@ -224,12 +257,23 @@
                        ((buffer-modified-p) "*  ")))
           "%b  (" invocation-name "@" system-name ")")))
 
+(defun copy-to-clipboard
+  (interactive))
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(delete-selection-mode t)
+ '(electric-indent-mode nil)
+ '(electric-pair-mode t)
+ '(ido-enable-flex-matching t)
+ '(ido-everywhere t)
  '(indent-tabs-mode nil)
+ '(initial-scratch-message "
+")
+ '(js-indent-level 2)
  '(tab-width 4))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
