@@ -44,7 +44,8 @@
 (global-linum-mode t)
 (column-number-mode t)
 (setq scroll-error-top-bottom 'true)
-(load-theme 'tango-dark t)
+(ignore-errors
+  (load-theme 'tango-dark t))
 
 ;; Load remote files over SSH
 (setq tramp-default-method "ssh")
