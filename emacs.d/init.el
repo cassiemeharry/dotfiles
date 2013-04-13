@@ -234,6 +234,19 @@
 ;;        ;; Only run on save, as my pylint script takes too long and is synchronous.
 ;;        )))
 
+;; Flymake-OCaml
+(require 'flymake)
+(add-to-list
+ 'flymake-allowed-file-name-masks
+ '(".+\\.mli?"
+   flymake-simple-make-init
+   flymake-simple-cleanup
+   flymake-get-real-file-name))
+(add-hook
+ 'tuareg-mode-hook
+ '(lambda ()
+    (if (not (null buffer-file-name)) (flymake-mode))))
+
 (add-to-list 'load-path "~/.emacs.d/elixir-mode")
 (require 'elixir-mode)
 
