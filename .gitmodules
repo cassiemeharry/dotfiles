@@ -1,0 +1,3 @@
+[submodule "emacs.d/elixir-mode"]
+	path = emacs.d/elixir-mode
+	url = git://github.com/elixir-lang/emacs-elixir.git
