@@ -155,11 +155,6 @@
 
 (global-set-key (kbd "C-c f") 'recentf-ido-find-file)
 
-; Let emacs "zone out" after a while
-(require 'zone)
-(setq zone-after-minutes 5)
-(zone-when-idle (* zone-after-minutes 60))
-
 ; Flyspell
 ;   Check my spelling while editing both text (C-c f) and code (C-c F).
 (setq ispell-program-name "aspell")
