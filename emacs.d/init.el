@@ -125,7 +125,10 @@
       (list "jsl" (list "-process" local-file "-nologo" "-nofilelisting" "-nocontext" "-nosummary"))))
   (add-to-list 'flymake-allowed-file-name-masks
                '("\\.js" flymake-js-init)))
-(add-hook 'find-file-hook 'flymake-find-file-hook)
+(add-hook 'find-file-hook
+          (lambda ()
+            (flymake-find-file-hook)
+            (flymake-cursor-mode t)))
 
 (require 'multiple-cursors)
 (global-set-key (kbd "M-N") 'mc/mark-next-like-this)
