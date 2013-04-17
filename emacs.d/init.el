@@ -185,6 +185,7 @@
     (if (not (null buffer-file-name)) (flymake-mode))))
 
 (add-to-list 'load-path "~/.emacs.d/elixir-mode")
+(setq-default elixir-mode-map (make-keymap))
 (require 'elixir-mode)
 
 (if (not window-system)
