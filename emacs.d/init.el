@@ -115,6 +115,18 @@
 (add-to-list 'auto-mode-alist '("\\.html$" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.htm$" . web-mode))
 
+; JS/Flymake
+(when (load "flymake" t)
+  (defun flymake-js-init ()
+    (let* ((temp-file (flymake-init-create-temp-buffer-copy 'flymake-create-temp-inplace))
+           (local-file (file-relative-name
+                        temp-file
+                        (file-name-directory buffer-file-name))))
+      (list "jsl" (list "-process" local-file "-nologo" "-nofilelisting" "-nocontext" "-nosummary"))))
+  (add-to-list 'flymake-allowed-file-name-masks
+               '("\\.js" flymake-js-init)))
+(add-hook 'find-file-hook 'flymake-find-file-hook)
+
 (require 'multiple-cursors)
 (global-set-key (kbd "M-N") 'mc/mark-next-like-this)
 (global-set-key (kbd "M-P") 'mc/mark-previous-like-this)
