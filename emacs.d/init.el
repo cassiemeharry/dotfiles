@@ -30,6 +30,9 @@
 (global-unset-key [(control z)])
 (global-unset-key [(control x)(control z)])
 
+;; Other random keybinds
+(global-set-key (kbd "C-x #") 'comment-region)
+
 ;; Highlight selections (marks)
 (setq transient-mark-mode t)
 
