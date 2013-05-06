@@ -176,10 +176,17 @@
 
 ;; Flymake-OCaml
 (require 'flymake)
+(defun flymake-ocaml-init ()
+  (flymake-simple-make-init-impl
+   'flymake-create-temp-with-folder-structure nil nil
+   (file-name-nondirectory buffer-file-name)
+   'flymake-get-ocaml-cmdline))
+(defun flymake-get-ocaml-cmdline (source base-dir)
+  (list "~/bin/ocaml_flycheck.pl" (list source base-dir)))
 (add-to-list
  'flymake-allowed-file-name-masks
  '(".+\\.mli?"
-   flymake-simple-make-init
+   flymake-ocaml-init
    flymake-simple-cleanup
    flymake-get-real-file-name))
 (add-hook
