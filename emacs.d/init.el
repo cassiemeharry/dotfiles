@@ -65,7 +65,7 @@
       "http://melpa.milkbox.net/packages/"))
 (package-initialize)
 (defvar my-packages
-  '(dash-at-point flymake flymake-cursor haste markdown-mode multiple-cursors python-mode rainbow-mode rust-mode tuareg zencoding-mode))
+  '(dash-at-point flymake flymake-cursor flymake-jshint haste markdown-mode multiple-cursors python-mode rainbow-mode rust-mode tuareg zencoding-mode))
 (defun my-packages-installed-p ()
   (all 'package-installed-p my-packages))
 
@@ -125,15 +125,9 @@
 (add-to-list 'auto-mode-alist '("\\.htm$" . web-mode))
 
 ; JS/Flymake
-(when (load "flymake" t)
-  (defun flymake-js-init ()
-    (let* ((temp-file (flymake-init-create-temp-buffer-copy 'flymake-create-temp-inplace))
-           (local-file (file-relative-name
-                        temp-file
-                        (file-name-directory buffer-file-name))))
-      (list "jsl" (list "-process" local-file "-nologo" "-nofilelisting" "-nocontext" "-nosummary"))))
-  (add-to-list 'flymake-allowed-file-name-masks
-               '("\\.js" flymake-js-init)))
+(require 'flymake-jshint)
+(add-hook 'javascript-mode-hook
+  (lambda () (flymake-mode t)))
 (add-hook 'find-file-hook
           (lambda ()
             (flymake-find-file-hook)
