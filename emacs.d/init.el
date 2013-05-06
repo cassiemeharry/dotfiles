@@ -65,7 +65,7 @@
       "http://melpa.milkbox.net/packages/"))
 (package-initialize)
 (defvar my-packages
-  '(flymake flymake-cursor haste markdown-mode multiple-cursors python-mode rainbow-mode rust-mode tuareg zencoding-mode))
+  '(dash-at-point flymake flymake-cursor haste markdown-mode multiple-cursors python-mode rainbow-mode rust-mode tuareg zencoding-mode))
 (defun my-packages-installed-p ()
   (all 'package-installed-p my-packages))
 
@@ -94,6 +94,10 @@
         (table (intern (concat mode "-syntax-table"))))
     (if (boundp table)
         (modify-syntax-entry ?_ "." (symbol-value table)))))
+
+(add-to-list 'dash-at-point-mode-alist '(python-mode . "python2")) ; Uses Py3k by default
+(when (eq system-type 'darwin)
+  (global-set-key (kbd "C-c d") 'dash-at-point))
 
 (defun markdown-custom ()
   "markdown-mode-hook"
