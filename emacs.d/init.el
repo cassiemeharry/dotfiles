@@ -35,6 +35,8 @@
 
 ;; Highlight selections (marks)
 (setq transient-mark-mode t)
+;; Highlight trailing spaces and all tabs
+(global-whitespace-mode t)
 
 ;; Watch all files and revert buffers whose backing files have changed.
 (global-auto-revert-mode t)
@@ -229,7 +231,8 @@
  '(initial-scratch-message "
 ")
  '(js-indent-level 2)
- '(tab-width 4))
+ '(tab-width 4)
+ '(whitespace-style (quote (face tabs trailing space-before-tab empty space-after-tab tab-mark))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
