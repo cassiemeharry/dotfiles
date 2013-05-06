@@ -67,3 +67,9 @@ alias django="python manage.py"
 alias edit='emacsclient -nw --alternate-editor="" -c'
 
 source ~/.zsh.d/syntax-highlighting/zsh-syntax-highlighting.zsh
+
+# OPAM configuration
+if [ -d ~/.opam ]; then
+    . ~/.opam/opam-init/init.zsh > /dev/null 2> /dev/null || true
+    eval `opam config env`
+fi
