@@ -230,6 +230,27 @@
       (process-send-eof proc)))
   (setq interprogram-cut-function 'paste-to-osx))
 
+(defun sudo-edit (&optional arg)
+  (interactive "P")
+  (if (or arg (not buffer-file-name))
+      (find-file (concat "/sudo:root@localhost:"
+                         (ido-read-file-name "Find file (as root): ")))
+    (find-alternate-file (concat "/sudo:root@localhost:" buffer-file-name))))
+(global-set-key (kbd "C-x C-r") 'sudo-edit)
+
+(global-set-key (kbd "H-[ h]") 'move-beginning-of-line)
+
+(defadvice find-file (after find-file-sudo activate)
+  "Find file as root if necessary."
+  (unless (and buffer-file-name
+               (file-writable-p buffer-file-name))
+    (find-alternate-file (concat "/sudo:root@localhost:" buffer-file-name))))
+(defadvice ido-find-file (after find-file-sudo activate)
+  "Find file as root if necessary."
+  (unless (and buffer-file-name
+               (file-writable-p buffer-file-name))
+    (find-alternate-file (concat "/sudo:root@localhost:" buffer-file-name))))
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
