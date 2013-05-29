@@ -72,7 +72,9 @@ alias edit='emacsclient -nw --alternate-editor="" -c'
 # Global aliases, can be specified anywhere (not just the beginning of a command)
 alias -g swapouterr='3>&1 1>&2 2>&3 3>&-'
 
-source ~/.zsh.d/syntax-highlighting/zsh-syntax-highlighting.zsh
+if [ -f ~/.zsh.d/syntax-highlighting/zsh-syntax-highlighting.zsh ]; then
+    source ~/.zsh.d/syntax-highlighting/zsh-syntax-highlighting.zsh
+fi
 
 # OPAM configuration
 if [ -d ~/.opam ]; then
