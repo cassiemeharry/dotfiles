@@ -299,10 +299,12 @@ point reaches the beginning or end of the buffer, stop there."
 ")
  '(js-indent-level 2)
  '(tab-width 4)
- '(whitespace-style (quote (face tabs trailing space-before-tab empty space-after-tab tab-mark))))
+ '(whitespace-style (quote (face tabs trailing space-before-tab space-after-tab tab-mark))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(markdown-pre-face ((t (:inherit font-lock-constant-face :foreground "green")))))
+(put 'upcase-region 'disabled nil)
+(put 'narrow-to-region 'disabled nil)
