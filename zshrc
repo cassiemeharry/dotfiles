@@ -11,7 +11,7 @@ compinit
 setopt COMPLETE_IN_WORD
 
 setopt EXTENDED_GLOB
-setopt NO_NOMATCH
+unsetopt NOMATCH
 
 ## keep background processes at full speed
 #setopt NOBGNICE
@@ -19,17 +19,20 @@ setopt NO_NOMATCH
 #setopt HUP
 
 ## history
-HISTSIZE=1000
-SAVEHIST=1000
+HISTSIZE=100000
+SAVEHIST=100000
 HISTFILE=~/.history
 
 setopt APPEND_HISTORY
 ## for sharing history between zsh processes
 setopt INC_APPEND_HISTORY
+setopt EXTENDED_HISTORY
 setopt SHARE_HISTORY
 setopt HIST_IGNORE_DUPS
 setopt HIST_IGNORE_SPACE
 setopt HIST_NO_FUNCTIONS
+setopt HIST_REDUCE_BLANKS
+setopt HIST_VERIFY
 
 setopt autocd notify
 bindkey -e
