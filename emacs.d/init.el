@@ -152,6 +152,10 @@ point reaches the beginning or end of the buffer, stop there."
 (add-to-list 'auto-mode-alist '("\\.html$" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.htm$" . web-mode))
 
+; Extra Python extensions
+(add-to-list 'auto-mode-alist '("\\.wsgi$" . python-mode))
+(add-to-list 'auto-mode-alist '("\\.hl7t$" . python-mode))
+
 ; JS/Flymake
 (require 'flymake-jshint)
 (add-hook 'javascript-mode-hook
