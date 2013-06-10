@@ -93,7 +93,7 @@ point reaches the beginning or end of the buffer, stop there."
       "http://melpa.milkbox.net/packages/"))
 (package-initialize)
 (defvar my-packages
-  '(dash-at-point flymake flymake-cursor flymake-jshint haste markdown-mode multiple-cursors python-mode rainbow-mode rust-mode tuareg zencoding-mode))
+  '(dash-at-point elixir-mode elixir-mix flymake flymake-cursor flymake-jshint haste markdown-mode multiple-cursors python-mode rainbow-mode rust-mode tuareg zencoding-mode))
 (defun my-packages-installed-p ()
   (all 'package-installed-p my-packages))
 
@@ -226,9 +226,12 @@ point reaches the beginning or end of the buffer, stop there."
  '(lambda ()
     (if (not (null buffer-file-name)) (flymake-mode))))
 
-(add-to-list 'load-path "~/.emacs.d/elixir-mode")
+;; Elixir, a Ruby-like language for the Erlang VM
 (setq-default elixir-mode-map (make-keymap))
-(require 'elixir-mode)
+(autoload 'elixir-mode "elixir-mode" "Major mode for Elixir" t)
+(add-to-list 'auto-mode-alist '("\\.exs?$" . elixir-mode))
+(autoload 'elixir-mix "elixir-mix" "Minor mode for Elixir Mix projects" t)
+(add-to-list 'auto-mode-alist '("\\.exs?$" . elixir-mix))
 
 (if (not window-system)
     (progn
