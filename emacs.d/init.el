@@ -301,6 +301,7 @@ point reaches the beginning or end of the buffer, stop there."
  '(initial-scratch-message "
 ")
  '(js-indent-level 2)
+ '(midnight-mode t nil (midnight))
  '(tab-width 4)
  '(whitespace-style (quote (face tabs trailing space-before-tab space-after-tab tab-mark))))
 (custom-set-faces
