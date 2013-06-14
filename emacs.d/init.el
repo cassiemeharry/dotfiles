@@ -93,7 +93,7 @@ point reaches the beginning or end of the buffer, stop there."
       "http://melpa.milkbox.net/packages/"))
 (package-initialize)
 (defvar my-packages
-  '(dash-at-point elixir-mode elixir-mix flymake flymake-cursor flymake-jshint haste markdown-mode multiple-cursors python-mode rainbow-mode rust-mode tuareg zencoding-mode))
+  '(dash-at-point elixir-mode elixir-mix flymake flymake-cursor flymake-jshint haste markdown-mode minimap multiple-cursors python-mode rainbow-mode rust-mode tuareg zencoding-mode))
 (defun my-packages-installed-p ()
   (all 'package-installed-p my-packages))
 
@@ -287,6 +287,16 @@ point reaches the beginning or end of the buffer, stop there."
                (file-writable-p buffer-file-name))
     (find-alternate-file (concat "/sudo:root@localhost:" buffer-file-name))))
 
+(defun single-window-with-minimap ()
+  (interactive)
+  (delete-other-windows)
+  (if (not (window-system))
+      (message "Can not show minimap in terminal window")
+    (linum-mode nil)
+    (minimap-create)
+    (linum-mode t)))
+(global-set-key (kbd "M-M") 'single-window-with-minimap)
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -302,6 +312,9 @@ point reaches the beginning or end of the buffer, stop there."
 ")
  '(js-indent-level 2)
  '(midnight-mode t nil (midnight))
+ '(minimap-dedicated-window t)
+ '(minimap-update-delay 0)
+ '(minimap-window-location (quote right))
  '(tab-width 4)
  '(whitespace-style (quote (face tabs trailing space-before-tab space-after-tab tab-mark))))
 (custom-set-faces
