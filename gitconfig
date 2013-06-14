@@ -34,7 +34,7 @@
 [branch]
 	autosetuprebase = always
 [push]
-	default = matching
+	default = current
 
 [include]
 	path = .gitconfig.local
