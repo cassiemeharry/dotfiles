@@ -93,7 +93,18 @@ point reaches the beginning or end of the buffer, stop there."
       "http://melpa.milkbox.net/packages/"))
 (package-initialize)
 (defvar my-packages
-  '(dash-at-point elixir-mode elixir-mix flymake flymake-cursor flymake-jshint haste markdown-mode minimap multiple-cursors python-mode rainbow-mode rust-mode tuareg zencoding-mode))
+  '(dash-at-point
+    elixir-mode elixir-mix
+    flymake flymake-cursor flymake-jshint
+    haste
+    markdown-mode
+    minimap
+    multiple-cursors
+    python-mode
+    rainbow-mode
+    rust-mode
+    tuareg
+    zencoding-mode))
 (defun my-packages-installed-p ()
   (all 'package-installed-p my-packages))
 
