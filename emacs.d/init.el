@@ -323,6 +323,7 @@ point reaches the beginning or end of the buffer, stop there."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(clean-buffer-list-delay-general 1)
  '(delete-selection-mode t)
  '(electric-indent-mode nil)
  '(electric-pair-mode t)
