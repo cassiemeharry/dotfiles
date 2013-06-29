@@ -334,7 +334,7 @@ point reaches the beginning or end of the buffer, stop there."
  '(js-indent-level 2)
  '(midnight-mode t nil (midnight))
  '(minimap-dedicated-window t)
- '(minimap-update-delay 0)
+ '(minimap-update-delay 0.1)
  '(minimap-window-location (quote right))
  '(tab-width 4)
  '(whitespace-style (quote (face tabs trailing space-before-tab space-after-tab tab-mark))))
