@@ -41,10 +41,6 @@ bindkey -e
 autoload -U colors
 colors
 
-if [ -e ~/.zshenv ]; then
-    source ~/.zshenv
-fi
-
 fpath=(~/.zsh.d/functions $fpath)
 autoload -U ~/.zsh.d/functions/*(:t)
 
@@ -80,4 +76,9 @@ fi
 if [ -d ~/.opam ]; then
     . ~/.opam/opam-init/init.zsh > /dev/null 2> /dev/null || true
     eval `opam config env`
+fi
+
+if [ -e ~/.zshenv ]; then
+    # Machine local config
+    source ~/.zshenv
 fi
