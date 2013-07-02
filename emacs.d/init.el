@@ -94,6 +94,7 @@ point reaches the beginning or end of the buffer, stop there."
 (package-initialize)
 (defvar my-packages
   '(dash-at-point
+    exec-path-from-shell
     elixir-mode elixir-mix
     flymake flymake-cursor flymake-jshint
     haste
@@ -127,6 +128,8 @@ point reaches the beginning or end of the buffer, stop there."
       (pm-dir (car (directory-files elpa-dir nil "python-mode-.+")))
       (python-mode.el (concat elpa-dir pm-dir "/python-mode.el")))
   (load python-mode.el))
+
+(exec-path-from-shell-initialize)
 
 (defun after-change-major-mode-hook ()
   "Sets the underscore character as a word boundary, so M-f and friends stop on it"
