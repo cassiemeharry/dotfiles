@@ -69,6 +69,22 @@ point reaches the beginning or end of the buffer, stop there."
 ;; Watch all files and revert buffers whose backing files have changed.
 (global-auto-revert-mode t)
 
+;; Don't clutter the filesystem with *~ files
+(setq backup-directory-alist
+      `((".*" . ,temporary-file-directory))
+      auto-save-file-name-transforms
+      `((".*" ,temporary-file-directory)))
+
+(defun clean-backup-files ()
+  (let ((week (* 60 60 24 7))
+        (current (float-time (current-time))))
+    (dolist (file (directory-files temporary-file-directory t))
+      (when (and (backup-file-name-p file)
+                 (> (- current (float-time (fifth (file-attributes file))))
+                    week))
+        (message "Deleting backup file %s" file)
+        (delete-file file)))))
+
 ;; Start in *scratch* instead of the splash screen
 (setq inhibit-splash-screen t)
 
@@ -336,6 +352,7 @@ point reaches the beginning or end of the buffer, stop there."
  '(initial-scratch-message "
 ")
  '(js-indent-level 2)
+ '(midnight-hook (quote (clean-buffer-list clean-backup-files)))
  '(midnight-mode t nil (midnight))
  '(minimap-dedicated-window t)
  '(minimap-update-delay 0.1)
