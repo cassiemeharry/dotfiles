@@ -1,3 +1,4 @@
+# -*- mode: sh; -*-
 #
 # .zshrc is sourced in interactive shells.
 # It should contain commands to set up aliases,
