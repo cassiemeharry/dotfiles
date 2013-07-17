@@ -70,8 +70,8 @@ promptHg () {
         print -n "[\e[31m$branch\e[0m:\e[31m$revision\e[0m]"
         if [[ $(hg status | grep '^M' | wc -l) -ne 0 ]]; then
             print " \e[41;37;1m!\e[0m"
-	else
-	    print ""
+        else
+            print ""
         fi
     fi
 }
@@ -90,14 +90,14 @@ promptGit () {
             print " \e[44;37;1m!\e[0m"
         else
             print ""
-	fi
+        fi
     fi
 }
 first_row_functions+=(promptGit)
 
 promptDr () {
     if [[ "$(hostname)" =~ "drchrono" ]]; then
-	print "\e[42;37;1mdr\e[0m"
+        print "\e[42;37;1mdr\e[0m"
     fi
 }
 second_row_functions+=(promptDr)
@@ -158,9 +158,9 @@ prompt () {
     first_row_length+=-2
 
     for func in $second_row_functions; do
-	current=$($func | tr -d '\n')
-	if [[ -n $current ]]; then
-	    [[ $func != $second_row_functions[1] ]] && second_row+="── "
+        current=$($func | tr -d '\n')
+        if [[ -n $current ]]; then
+            [[ $func != $second_row_functions[1] ]] && second_row+="── "
             second_row+=$current
             second_row+=" "
         fi
@@ -169,12 +169,12 @@ prompt () {
     second_row_length+=-2
 
     while (( $first_row_length < $second_row_length )); do
-	first_row+="─"
-	(( first_row_length += 1 ))
+        first_row+="─"
+        (( first_row_length += 1 ))
     done
     while (( $first_row_length > $second_row_length )); do
-	second_row+="─"
-	(( second_row_length += 1 ))
+        second_row+="─"
+        (( second_row_length += 1 ))
     done
 
     first_row+="─┐"
@@ -207,3 +207,7 @@ rprompt () {
         print "%F{cyan}$last%F{red} failed with status$plural %B${last_status}%b"
     fi
 }
+
+# Local Variables:
+# mode: sh
+# End:
