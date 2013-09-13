@@ -357,6 +357,8 @@ point reaches the beginning or end of the buffer, stop there."
  '(minimap-dedicated-window t)
  '(minimap-update-delay 0.1)
  '(minimap-window-location (quote right))
+ '(mouse-wheel-progressive-speed nil)
+ '(mouse-wheel-scroll-amount (quote (1)))
  '(tab-width 4)
  '(whitespace-style (quote (face tabs trailing space-before-tab space-after-tab tab-mark))))
 (custom-set-faces
