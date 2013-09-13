@@ -122,6 +122,7 @@ point reaches the beginning or end of the buffer, stop there."
     rainbow-mode
     rust-mode
     tuareg
+    web-mode
     zencoding-mode))
 (defun my-packages-installed-p ()
   (all 'package-installed-p my-packages))
@@ -195,12 +196,8 @@ point reaches the beginning or end of the buffer, stop there."
 
 ; JS/Flymake
 (require 'flymake-jshint)
-(add-hook 'javascript-mode-hook
-  (lambda () (flymake-mode t)))
-(add-hook 'find-file-hook
-          (lambda ()
-            (flymake-find-file-hook)
-            (flymake-cursor-mode t)))
+;(add-hook 'javascript-mode-hook
+;  (lambda () (flymake-mode t)))
 
 (require 'multiple-cursors)
 (global-set-key (kbd "M-N") 'mc/mark-next-like-this)
@@ -360,6 +357,7 @@ point reaches the beginning or end of the buffer, stop there."
  '(mouse-wheel-progressive-speed nil)
  '(mouse-wheel-scroll-amount (quote (1)))
  '(tab-width 4)
+ '(whitespace-global-modes (quote (not web-mode)))
  '(whitespace-style (quote (face tabs trailing space-before-tab space-after-tab tab-mark))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
