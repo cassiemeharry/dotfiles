@@ -291,6 +291,9 @@ point reaches the beginning or end of the buffer, stop there."
                        ((buffer-modified-p) "*  ")))
           "%b  (" invocation-name "@" system-name ")")))
 
+(if window-system
+    (server-start))
+
 (when (eq system-type 'darwin)
   (defun copy-from-osx ()
     (shell-command-to-string "pbpaste"))
