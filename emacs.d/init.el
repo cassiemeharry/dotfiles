@@ -265,8 +265,6 @@ point reaches the beginning or end of the buffer, stop there."
 (setq-default elixir-mode-map (make-keymap))
 (autoload 'elixir-mode "elixir-mode" "Major mode for Elixir" t)
 (add-to-list 'auto-mode-alist '("\\.exs?$" . elixir-mode))
-(autoload 'elixir-mix "elixir-mix" "Minor mode for Elixir Mix projects" t)
-(add-to-list 'auto-mode-alist '("\\.exs?$" . elixir-mix))
 
 (autoload 'puppet-mode "puppet-mode" "Puppet config files" t)
 (add-to-list 'auto-mode-alist '("\\.pp$" . puppet-mode))
