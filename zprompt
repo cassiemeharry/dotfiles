@@ -49,11 +49,6 @@ promptCwd () {
 }
 first_row_functions+=(promptCwd)
 
-promptDate () {
-    date +'%B %e, %I:%M %p'
-}
-first_row_functions+=(promptDate)
-
 export VIRTUAL_ENV_DISABLE_PROMPT=yes
 promptVenv () {
     if [[ -n $VIRTUAL_ENV ]]; then
@@ -67,7 +62,7 @@ promptHg () {
     if hg status >/dev/null 2>&1; then
         local branch=$(hg branch)
         local revision=$(hg identify | cut -d' ' -f1)
-        print -n "[\e[31m$branch\e[0m:\e[31m$revision\e[0m]"
+        print -n "[\e[31m$branch $revision\e[0m]"
         if [[ $(hg status | grep '^M' | wc -l) -ne 0 ]]; then
             print " \e[41;37;1m!\e[0m"
         else
@@ -83,8 +78,8 @@ promptGit () {
     fi
     if git rev-parse --git-dir >/dev/null 2>&1; then
         local branch=$(git symbolic-ref HEAD 2>/dev/null | cut -d'/' -f3-)
-        local revision=$(git rev-parse --short --verify HEAD)
-        print -n "[\e[34;1m$branch\e[0m:\e[34;1m$revision\e[0m]"
+        local revision=$(git rev-parse --short --verify HEAD 2>/dev/null || echo "<empty>")
+        print -n "[\e[34;1m$branch $revision\e[0m]"
         (( first_row_width += 7 + $#branch + $#revision ))
         if [[ $(git status --short --untracked-files=no | wc -l) -ne 0 ]]; then
             print " \e[44;37;1m!\e[0m"
@@ -103,9 +98,16 @@ promptDr () {
 second_row_functions+=(promptDr)
 
 promptUserHost () {
-    print -P "\e[1m%n\e[0m@\e[32m%m\e[0m"
+    if [[ -n "$SSH_CONNECTION" ]]; then
+        print -P "\e[1m%n\e[0m@\e[32m%m\e[0m"
+    fi
 }
 second_row_functions+=(promptUserHost)
+
+promptDate () {
+    date +'%B %e, %I:%M %p'
+}
+second_row_functions+=(promptDate)
 
 promptMail () {
     if ! mail -e; then
@@ -183,7 +185,7 @@ prompt () {
     third_row+=$(promptPrompt | tr -d '\n')
     third_row+="%$(perceivedLength $third_row)G%} "
 
-    print "%{"
+    print -n "%{"
     print $first_row
     print $second_row
     print $third_row
