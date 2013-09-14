@@ -109,7 +109,8 @@ point reaches the beginning or end of the buffer, stop there."
       "http://melpa.milkbox.net/packages/"))
 (package-initialize)
 (defvar my-packages
-  '(dash-at-point
+  '(ack
+    dash-at-point
     exec-path-from-shell
     elixir-mode elixir-mix
     flymake flymake-cursor flymake-jshint
