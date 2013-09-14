@@ -1,3 +1,5 @@
+# -*- mode: conf-unix; -*-
+
 [MASTER]
 
 # Specify a configuration file.
@@ -37,6 +39,9 @@ disable=C,R,W0141,W0142,W0201,W0403,E1101,E0102
 
 
 [REPORTS]
+
+# Show symbolic names instead of error codes
+symbols=yes
 
 # Set the output format. Available formats are text, parseable, colorized, msvs
 # (visual studio) and html
@@ -160,7 +165,7 @@ zope=no
 # List of members which are set dynamically and missed by pylint inference
 # system, and so shouldn't trigger E0201 when accessed. Python regular
 # expressions are accepted.
-generated-members=objects,save,DoesNotExist,id
+generated-members=objects,save,DoesNotExist,MultipleObjectsReturned,id
 
 
 [VARIABLES]
