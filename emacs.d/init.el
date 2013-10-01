@@ -249,7 +249,7 @@ point reaches the beginning or end of the buffer, stop there."
    (file-name-nondirectory buffer-file-name)
    'flymake-get-ocaml-cmdline))
 (defun flymake-get-ocaml-cmdline (source base-dir)
-  (list "~/bin/ocaml_flycheck.pl" (list source base-dir)))
+  (list "~/bin/ocaml_flycheck.py" (list source base-dir)))
 (add-to-list
  'flymake-allowed-file-name-masks
  '(".+\\.mli?"
@@ -334,6 +334,7 @@ point reaches the beginning or end of the buffer, stop there."
  '(delete-selection-mode t)
  '(electric-indent-mode nil)
  '(electric-pair-mode t)
+ '(flymake-no-changes-timeout 3)
  '(ido-enable-flex-matching t)
  '(ido-everywhere t)
  '(indent-tabs-mode nil)
