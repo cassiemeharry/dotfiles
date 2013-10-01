@@ -38,3 +38,5 @@
 
 [include]
 	path = .gitconfig.local
+[rebase]
+	autosquash = true
