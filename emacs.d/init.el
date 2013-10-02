@@ -195,6 +195,19 @@ point reaches the beginning or end of the buffer, stop there."
 (setq epa-file-name-regexp "\\.\\(gpg\\|\\asc\\)$")
 (epa-file-name-regexp-update)
 
+; Objective-C
+(defun is-h-file-objc? ()
+  (let* ((file-path (buffer-file-name))
+         (file-ext (or (and (stringp file-path) (downcase (file-name-extension file-path))) ""))
+         (m-file (concat (file-name-sans-extension file-path) ".m"))
+         (mm-file (concat (file-name-sans-extension file-path) ".mm")))
+    (and (string= file-ext "h")
+         (or (file-exists-p m-file)
+             (file-exists-p mm-file)
+             (directory-files (file-name-directory file-path) t (regexp-opt '("\.xib" "\.xcodeproj")))))))
+(add-to-list 'magic-mode-alist '(is-h-file-objc? . objc-mode))
+(add-to-list 'auto-mode-alist '("\\.mm?$" . objc-mode))
+
 ; JS/Flymake
 (require 'flymake-jshint)
 ;(add-hook 'javascript-mode-hook
