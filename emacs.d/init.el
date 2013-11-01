@@ -354,6 +354,8 @@ point reaches the beginning or end of the buffer, stop there."
  '(flymake-no-changes-timeout 3)
  '(ido-enable-flex-matching t)
  '(ido-everywhere t)
+ '(ido-use-filename-at-point (quote guess))
+ '(ido-use-url-at-point t)
  '(indent-tabs-mode nil)
  '(initial-scratch-message "
 ")
