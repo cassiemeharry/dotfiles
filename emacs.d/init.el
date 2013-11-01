@@ -350,6 +350,7 @@ point reaches the beginning or end of the buffer, stop there."
  '(delete-selection-mode t)
  '(electric-indent-mode nil)
  '(electric-pair-mode t)
+ '(flymake-gui-warnings-enabled nil)
  '(flymake-no-changes-timeout 3)
  '(ido-enable-flex-matching t)
  '(ido-everywhere t)
