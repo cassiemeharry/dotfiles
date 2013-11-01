@@ -114,6 +114,7 @@ point reaches the beginning or end of the buffer, stop there."
     exec-path-from-shell
     elixir-mode elixir-mix
     flymake flymake-cursor flymake-jshint
+    find-file-in-repository
     haste
     markdown-mode
     minimap
@@ -273,6 +274,8 @@ point reaches the beginning or end of the buffer, stop there."
  'tuareg-mode-hook
  '(lambda ()
     (if (not (null buffer-file-name)) (flymake-mode))))
+
+(global-set-key (kbd "C-x C-f") 'find-file-in-repository)
 
 ;; Elixir, a Ruby-like language for the Erlang VM
 (setq-default elixir-mode-map (make-keymap))
