@@ -83,3 +83,7 @@ if [ -e ~/.zshenv ]; then
     # Machine local config
     source ~/.zshenv
 fi
+
+if [ -d ~/.rbenv ]; then
+    eval "$(rbenv init -)"
+fi
