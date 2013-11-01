@@ -333,9 +333,9 @@ point reaches the beginning or end of the buffer, stop there."
 
 (defun single-window-with-minimap ()
   (interactive)
-  (delete-other-windows)
   (if (not (window-system))
       (message "Can not show minimap in terminal window")
+    (delete-other-windows)
     (linum-mode nil)
     (minimap-create)
     (linum-mode t)))
