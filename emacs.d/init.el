@@ -85,6 +85,23 @@ point reaches the beginning or end of the buffer, stop there."
         (message "Deleting backup file %s" file)
         (delete-file file)))))
 
+;; Cleanup whitespace
+(defun cleanup-dir-whitespace (directory)
+  "Clean up whitespace in all .py files in a given directory"
+  (interactive "DDirectory to clean (recursively): ")
+  (let ((py-files
+         (f-entries "~/code/opw/onpatient-web"
+                    (lambda (p) (s-ends-with? ".py" p))
+                    t)))
+    (mapcar (lambda (path)
+              (message "Processing %s..." path)
+              (with-temp-buffer
+                (insert-file-contents path)
+                (whitespace-cleanup)
+                (write-region 1 (point-max) path)))
+            py-files)
+    (message "Done, cleaned %s files" (length py-files))))
+
 ;; Start in *scratch* instead of the splash screen
 (setq inhibit-splash-screen t)
 
@@ -125,7 +142,9 @@ point reaches the beginning or end of the buffer, stop there."
     rust-mode
     tuareg
     web-mode
-    zencoding-mode))
+    zencoding-mode
+    s
+    f))
 (defun my-packages-installed-p ()
   (all 'package-installed-p my-packages))
 
