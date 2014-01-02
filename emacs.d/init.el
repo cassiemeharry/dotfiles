@@ -434,6 +434,7 @@ the checking happens for all pairs in auto-minor-mode-alist"
  '(mouse-wheel-progressive-speed nil)
  '(mouse-wheel-scroll-amount (quote (1)))
  '(tab-width 4)
+ '(uniquify-buffer-name-style (quote post-forward-angle-brackets) nil (uniquify))
  '(whitespace-global-modes (quote (not web-mode)))
  '(whitespace-style (quote (face tabs trailing space-before-tab space-after-tab tab-mark))))
 (custom-set-faces
