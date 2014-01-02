@@ -30,9 +30,6 @@
 (global-unset-key [(control z)])
 (global-unset-key [(control x)(control z)])
 
-;; Other random keybinds
-(global-set-key (kbd "C-x #") 'comment-region)
-
 ;; Make C-a smarter
 (defun smarter-move-beginning-of-line (arg)
   "Move point back to indentation of beginning of line.
@@ -133,6 +130,7 @@ point reaches the beginning or end of the buffer, stop there."
     flymake flymake-cursor flymake-jshint
     find-file-in-repository
     haste
+    magit
     markdown-mode
     minimap
     multiple-cursors
@@ -298,12 +296,24 @@ point reaches the beginning or end of the buffer, stop there."
  '(lambda ()
     (if (not (null buffer-file-name)) (flymake-mode))))
 
-(global-set-key (kbd "C-x C-f") 'find-file-in-repository)
+;; Magit, a Git frontend
+(global-set-key (kbd "C-x C-g") 'magit-status)
 
 ;; Elixir, a Ruby-like language for the Erlang VM
 (setq-default elixir-mode-map (make-keymap))
 (autoload 'elixir-mode "elixir-mode" "Major mode for Elixir" t)
 (add-to-list 'auto-mode-alist '("\\.exs?$" . elixir-mode))
+(defun elixir-run-tests ()
+  "Run the current buffer's project's Elixir Mix tests"
+  (interactive)
+  ; find mix.exs dir
+  (let ((cwd (f-dirname buffer-file-name))
+        (mix-dir (f-traverse-upwards (lambda (d)
+                                       (member "mix.exs" (mapcar 'f-filename (f-files d)))))))
+    (if (not mix-dir)
+        (message "Could not find mix.exs")
+      (shell-command (format "cd %S && mix test" mix-dir)))))
+(define-key elixir-mode-map (kbd "C-c C-t") 'elixir-run-tests)
 
 (autoload 'puppet-mode "puppet-mode" "Puppet config files" t)
 (add-to-list 'auto-mode-alist '("\\.pp$" . puppet-mode))
