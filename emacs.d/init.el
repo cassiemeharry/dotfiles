@@ -160,6 +160,29 @@ point reaches the beginning or end of the buffer, stop there."
         (package-install p)
         (message "  * Done installing package")))))
 
+(defvar auto-minor-mode-alist ()
+  "Alist of filename patterns vs correpsonding minor mode functions, see `auto-mode-alist'
+All elements of this alist are checked, meaning you can enable multiple minor modes for the same regexp.")
+(defun enable-minor-mode-based-on-extension ()
+  "check file name against auto-minor-mode-alist to enable minor modes
+the checking happens for all pairs in auto-minor-mode-alist"
+  (when buffer-file-name
+    (let ((name buffer-file-name)
+          (remote-id (file-remote-p buffer-file-name))
+          (alist auto-minor-mode-alist))
+      ;; Remove backup-suffixes from file name.
+      (setq name (file-name-sans-versions name))
+      ;; Remove remote file name identification.
+      (when (and (stringp remote-id)
+                 (string-match-p (regexp-quote remote-id) name))
+        (setq name (substring name (match-end 0))))
+      (while (and alist (caar alist) (cdar alist))
+        (if (string-match (caar alist) name)
+            (funcall (cdar alist) 1))
+        (setq alist (cdr alist))))))
+
+(add-hook 'find-file-hook 'enable-minor-mode-based-on-extension)
+
 ;; Configure packages
 (let* ((elpa-dir "~/.emacs.d/elpa/") ; Hack to load the correct python-mode
       (pm-dir (car (directory-files elpa-dir nil "python-mode-.+")))
@@ -373,6 +396,16 @@ point reaches the beginning or end of the buffer, stop there."
     (minimap-create)
     (linum-mode t)))
 (global-set-key (kbd "M-M") 'single-window-with-minimap)
+
+; Fill and spell check git commit messages.
+(add-to-list 'auto-minor-mode-alist '("COMMIT_EDITMSG" . auto-fill-mode))
+(add-to-list 'auto-minor-mode-alist '("COMMIT_EDITMSG" . flyspell-mode))
+
+; Sass
+(add-to-list 'auto-mode-alist '("\\.sass" . sass-mode))
+(add-to-list 'auto-mode-alist '("\\.scss" . sass-mode))
+(add-to-list 'auto-minor-mode-alist '("\\.sass" . rainbow-mode))
+(add-to-list 'auto-minor-mode-alist '("\\.scss" . rainbow-mode))
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
