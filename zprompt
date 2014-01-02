@@ -110,7 +110,7 @@ promptDate () {
 second_row_functions+=(promptDate)
 
 promptMail () {
-    if ! mail -e; then
+    if ! mail -e >/dev/null 2>&1; then
         return
     fi
     count=$[$(mail -H | wc -l) - 2]
