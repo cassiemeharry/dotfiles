@@ -1,1 +1,5 @@
 --ignore-dir=migrations
+--type-add
+css=.scss,.sass
+--type-set
+elixir=.ex,.exs
