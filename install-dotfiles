@@ -35,7 +35,7 @@ dotfiles="
     zprompt
     zsh.d
 
-    ssh/config
+    tmux.conf
 "
 
 dotfiles_dir="$(dirname $(abspath $0))"
