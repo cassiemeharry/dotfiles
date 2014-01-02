@@ -144,7 +144,8 @@ point reaches the beginning or end of the buffer, stop there."
     web-mode
     zencoding-mode
     s
-    f))
+    f
+    jedi))
 (defun my-packages-installed-p ()
   (all 'package-installed-p my-packages))
 
@@ -208,6 +209,9 @@ point reaches the beginning or end of the buffer, stop there."
 ; Extra Python extensions
 (add-to-list 'auto-mode-alist '("\\.wsgi$" . python-mode))
 (add-to-list 'auto-mode-alist '("\\.hl7t$" . python-mode))
+(add-hook 'python-mode-hook 'jedi:setup)
+(setq jedi:setup-keys t)
+(setq jedi:complete-on-dot t)
 
 ; Open .asc files with EasyPG
 (require 'epa-file)
