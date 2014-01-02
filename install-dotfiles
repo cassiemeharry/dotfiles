@@ -1,24 +1,19 @@
 #!/bin/sh
 
-abspath () {
-    case "$1" in
-        /*)
-        printf "%s\n" "$1"
-        ;;
+set -e
+if [ "$(basename "$0")" != install-dotfiles ]; then
+    if ! which git >/dev/null; then
+        echo "Please install git first" 1>&2
+        exit 1
+    fi
+    if [ ! -d "$HOME/.dotfiles" ]; then
+        echo "Downloading dotfiles..."
+        git clone "https://github.com/nickmeharry/dotfiles.git" "$HOME/.dotfiles"
+    fi
+    cd
 
-        *)
-        printf "%s\n" "$PWD/$1"
-        ;;
-    esac
-}
-
-canonicalize () {
-    file=$(abspath $1)
-    pushd "$(dirname -- "$file" )" > /dev/null
-    cpath="$(echo $(pwd -P)/$(basename -- $file) | sed -e "s|$HOME|~|")"
-    printf '%s\n' $cpath
-    popd > /dev/null
-}
+    exec "$HOME/.dotfiles/install-dotfiles"
+fi
 
 dotfiles="
     emacs.d
@@ -31,19 +26,18 @@ dotfiles="
     pylintrc
 
     zshrc
-    zshenv
     zprompt
     zsh.d
 
     tmux.conf
 "
 
-dotfiles_dir="$(dirname $(abspath $0))"
+dotfiles_dir=".dotfiles"
 
 cd $HOME
 
 for df in $dotfiles; do
-    source="$(canonicalize $dotfiles_dir/$df)"
+    source="$dotfiles_dir/$df"
     target=".$df"
 
     if [ $target != "$(basename $target)" -a ! -e "$(dirname $target)" ]; then
@@ -51,7 +45,8 @@ for df in $dotfiles; do
         mkdir -p "$(dirname $target)"
     fi
 
-    if [ ! -e $target ]; then
+    if [ ! -L $target -o "$(readlink $target)" != "$source" ]; then
+        [ -e $target -o -L $target ] && rm $target
         echo "Linking $source to $target"
         ln -s $source $target
     fi
