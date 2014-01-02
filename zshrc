@@ -5,6 +5,9 @@
 # functions, options, key bindings, etc.
 #
 
+fpath=(~/.zsh.d/functions $fpath)
+autoload -U ~/.zsh.d/functions/*(:t)
+
 autoload -Uz compinit
 compinit
 
@@ -42,9 +45,6 @@ bindkey -e
 autoload -U colors
 colors
 
-fpath=(~/.zsh.d/functions $fpath)
-autoload -U ~/.zsh.d/functions/*(:t)
-
 typeset -ga chpwd_functions
 chpwd_functions+='chpwd_auto_venv'
 
@@ -79,11 +79,11 @@ if [ -d ~/.opam ]; then
     eval `opam config env`
 fi
 
+if [ -d ~/.rbenv ]; then
+    eval "$(rbenv init -)"
+fi
+
 if [ -e ~/.zshenv ]; then
     # Machine local config
     source ~/.zshenv
-fi
-
-if [ -d ~/.rbenv ]; then
-    eval "$(rbenv init -)"
 fi
