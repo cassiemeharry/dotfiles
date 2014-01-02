@@ -8,3 +8,7 @@
 # Compiled files
 *.pyc
 *.elc
+
+# Python virtual environments
+.Python
+.venv/
