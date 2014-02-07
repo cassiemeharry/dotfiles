@@ -268,6 +268,16 @@ the checking happens for all pairs in auto-minor-mode-alist"
 (require 'ido)
 (ido-mode t)
 
+(global-set-key (kbd "C-x C-b") 'ibuffer)
+;; Ensure ibuffer opens with point at the current buffer's entry.
+(defadvice ibuffer
+  (around ibuffer-point-to-most-recent) ()
+  "Open ibuffer with cursor pointed to most recent buffer name."
+  (let ((recent-buffer-name (buffer-name)))
+    ad-do-it
+    (ibuffer-jump-to-buffer recent-buffer-name)))
+(ad-activate 'ibuffer)
+
 ; Recent files
 (require 'recentf)
 (setq recentf-max-saved-items 200
