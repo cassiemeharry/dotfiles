@@ -1,3 +1,4 @@
+# -*- mode: sh -*-
 # Nick's Fancy Prompt
 #
 # This prompt is modular, meaning that new segments simply need to be
@@ -196,9 +197,15 @@ prompt2 () {
 }
 
 rprompt () {
-    local last_status="$pipestatus"
-    local command_count="${#last_status}"
-    if [[ $command_count > 1 ]]; then
+    last_status=($pipestatus)
+    typeset -U uniqs
+    uniqs=($last_status)
+
+    if [[ "$uniqs" == "0" ]]; then
+        return
+    fi
+
+    if [[ $#last_status > 1 ]]; then
         local plural="es"
     else
         local plural=""
@@ -209,7 +216,3 @@ rprompt () {
         print "%F{cyan}$last%F{red} failed with status$plural %B${last_status}%b"
     fi
 }
-
-# Local Variables:
-# mode: sh
-# End:
