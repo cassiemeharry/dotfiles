@@ -328,6 +328,18 @@ the checking happens for all pairs in auto-minor-mode-alist"
  'tuareg-mode-hook
  '(lambda ()
     (if (not (null buffer-file-name)) (flymake-mode))))
+(let ((indent-versions (file-expand-wildcards "~/.opam/*/share/typerex/ocp-indent/ocp-indent.el"))
+      (latest-file nil))
+  (when indent-versions
+    (with-temp-buffer
+      (mapc (lambda (p) (insert p "\n")) indent-versions)
+      (sort-lines nil (point-min) (point-max))
+      (end-of-buffer)
+      (delete-backward-char 1)
+      (beginning-of-line)
+      (setq latest-file (buffer-substring-no-properties (point) (point-max)))
+      (load-file latest-file))))
+(if (file-expand-wildcards "~/.opam/*/share/typerex/ocp-indent/ocp-indent.el"))
 
 ;; Magit, a Git frontend
 (global-set-key (kbd "C-x g") 'magit-status)
