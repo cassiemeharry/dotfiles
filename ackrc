@@ -1,4 +1,5 @@
 --ignore-dir=migrations
+--ignore-dir=node_modules
 --type-add
 css=.scss,.sass
 --type-set
