@@ -320,7 +320,7 @@ the checking happens for all pairs in auto-minor-mode-alist"
     (if (not (null buffer-file-name)) (flymake-mode))))
 
 ;; Magit, a Git frontend
-(global-set-key (kbd "C-x C-g") 'magit-status)
+(global-set-key (kbd "C-x g") 'magit-status)
 
 ;; Elixir, a Ruby-like language for the Erlang VM
 (setq-default elixir-mode-map (make-keymap))
