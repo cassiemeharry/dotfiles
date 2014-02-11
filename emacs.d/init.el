@@ -460,8 +460,11 @@ the checking happens for all pairs in auto-minor-mode-alist"
   colorlinks=true}
 ")
  '(org-export-latex-packages-alist nil)
+ '(scroll-bar-mode nil)
  '(tab-width 4)
+ '(tool-bar-mode nil)
  '(uniquify-buffer-name-style (quote post-forward-angle-brackets) nil (uniquify))
+ '(visible-bell t)
  '(whitespace-global-modes (quote (not web-mode)))
  '(whitespace-style (quote (face tabs trailing space-before-tab space-after-tab tab-mark))))
 (custom-set-faces
