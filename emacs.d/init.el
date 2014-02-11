@@ -425,6 +425,8 @@ the checking happens for all pairs in auto-minor-mode-alist"
 (add-to-list 'auto-minor-mode-alist '("\\.sass" . rainbow-mode))
 (add-to-list 'auto-minor-mode-alist '("\\.scss" . rainbow-mode))
 
+(add-hook 'org-mode-hook 'auto-fill-mode)
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -451,6 +453,13 @@ the checking happens for all pairs in auto-minor-mode-alist"
  '(minimap-window-location (quote right))
  '(mouse-wheel-progressive-speed nil)
  '(mouse-wheel-scroll-amount (quote (1)))
+ '(org-export-latex-hyperref-options-format "\\hypersetup{
+  pdfkeywords={%s},
+  pdfsubject={%s},
+  pdfcreator={Emacs Org-mode version %s},
+  colorlinks=true}
+")
+ '(org-export-latex-packages-alist nil)
  '(tab-width 4)
  '(uniquify-buffer-name-style (quote post-forward-angle-brackets) nil (uniquify))
  '(whitespace-global-modes (quote (not web-mode)))
