@@ -188,7 +188,8 @@ the checking happens for all pairs in auto-minor-mode-alist"
       (python-mode.el (concat elpa-dir pm-dir "/python-mode.el")))
   (load python-mode.el))
 
-(exec-path-from-shell-initialize)
+(unless (eq system-type 'windows-nt)
+  (exec-path-from-shell-initialize))
 
 (defun after-change-major-mode-hook ()
   "Sets the underscore character as a word boundary, so M-f and friends stop on it"
