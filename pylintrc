@@ -13,7 +13,9 @@ persistent=yes
 
 [MESSAGES CONTROL]
 # Disable the message, report, category or checker with the given id(s).
-disable=I,C,R,bad-builtin,star-args,attribute-defined-outside-init,no-init,relative-import,fixme,no-member,bare-except
+#disable=I,C,star-args,no-member,no-init
+disable=I,C,R,bad-builtin,attribute-defined-outside-init,relative-import,fixme,star-args,no-member,no-init
+# unused-import,unused-wildcard-import,bare-except
 
 
 [REPORTS]
@@ -120,6 +122,11 @@ ignore-mixin-members=yes
 # List of classes names for which member attributes should not be checked
 # (useful for classes with attributes dynamically set).
 ignored-classes=SQLObject
+
+# List of module names for which member attributes should not be checked
+# (useful for modules/projects where namespaces are manipulated during runtime
+# and thus existing member attributes cannot be deduced by static analysis
+ignored-modules=requests.models
 
 # When zope mode is activated, add a predefined set of Zope acquired attributes
 # to generated-members.
