@@ -62,6 +62,8 @@ alias la='ls -lAhS'
 alias grep='grep --color=auto'
 alias nano='nano -w'
 alias memusage="ps -u $LOGNAME -o pid,rss,command | sort -n +1 -2"
+alias edit='emacsclient -nw --alternate-editor="" -c'
+
 alias pycheck="python -m py_compile"
 alias dj='python manage.py'
 alias djsp='python manage.py shell_plus --quiet-load'
@@ -69,6 +71,18 @@ alias djmigrate='python manage.py migrate --merge --ignore-ghost-migrations'
 
 # Global aliases, can be specified anywhere (not just the beginning of a command)
 alias -g swapouterr='3>&1 1>&2 2>&3 3>&-'
+
+function tac () {
+    awk '1 { last = NR; line[last] = $0; } END { for (i = last; i > 0; i--) { print line[i]; } }'
+}
+
+# Alias functions, for more complicated replacements
+if which colordiff > /dev/null 2>/dev/null; then
+    function diff () {
+        colordiff $@ | less -R -F -X
+    }
+fi
+
 
 if [ -f ~/.zsh.d/syntax-highlighting/zsh-syntax-highlighting.zsh ]; then
     source ~/.zsh.d/syntax-highlighting/zsh-syntax-highlighting.zsh
