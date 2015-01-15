@@ -15,6 +15,9 @@
 local -aU first_row_functions second_row_functions aux_functions
 
 promptTitle () {
+    if [[ $INSIDE_EMACS != "" ]]; then
+        return
+    fi
     if [[ -n $VIRTUAL_ENV ]]; then
         print "\e]1;($(basename $VIRTUAL_ENV)) $(basename $(pwd))\a"
     else
@@ -25,7 +28,7 @@ aux_functions+=(promptTitle)
 
 promptCwd () {
     local pwd="$(pwd)"
-    local cwd="$(print -P %~)"
+    local cwd="$(print -P '%~')"
     local h="$(basename "$cwd")"
     local t="$(dirname "$cwd")"
     if [[ $t == '.' || ( $t == '/' && $h == '/' ) ]]; then
@@ -141,6 +144,7 @@ perceivedLength () {
 }
 
 prompt () {
+    [[ $TERM == eterm* ]] && export TERM=xterm
     [[ $(perceivedLength "\e[36mCyan\e[m") -ne 4 ]] && echo "perceivedLength is wrong! $ " && return
     local first_row="┌── " second_row="│" third_row="└ " current=""
     integer first_row_length second_row_length third_row_length
