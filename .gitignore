@@ -2,10 +2,14 @@
 *~
 emacs.d/abbrev_defs
 emacs.d/ac-comphist.dat
+emacs.d/bookmarks
 emacs.d/el-get
 emacs.d/elpa
+emacs.d/init/nickmeharry.el
+emacs.d/request/
 emacs.d/server/server
 emacs.d/tramp
+emacs.d/url/
+emacs.d/web-vcs-log.org
 ssh
 zsh.d/venvs
-emacs.d/init/nickmeharry.el
