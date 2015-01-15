@@ -1,0 +1,12 @@
+# -*- mode: snippet; require-final-newline: nil -*-
+# name: <div class="control-group">...</div>
+# key: control-group
+# binding: direct-keybinding
+# --
+<div class="control-group">
+  <label class="control-label">$1</label>
+  <div class="controls">
+    $0${2:
+    <span class="help-inline">$3</span>}
+  </div>
+</div>

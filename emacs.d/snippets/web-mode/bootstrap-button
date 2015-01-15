@@ -1,0 +1,6 @@
+# -*- mode: snippet; require-final-newline: nil -*-
+# name: Bootstrap Button
+# key: .btn
+# binding: direct-keybinding
+# --
+<button type="${1:button}" class="btn${2: $3}">$0</button>
