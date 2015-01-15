@@ -73,17 +73,17 @@ if [ -f ~/.zsh.d/syntax-highlighting/zsh-syntax-highlighting.zsh ]; then
     source ~/.zsh.d/syntax-highlighting/zsh-syntax-highlighting.zsh
 fi
 
-# OPAM configuration
-if [ -d ~/.opam ]; then
-    . ~/.opam/opam-init/init.zsh > /dev/null 2> /dev/null || true
-    eval `opam config env`
+if [ -e ~/.zshenv ]; then
+    # Machine local config
+    source ~/.zshenv
 fi
 
 if [ -d ~/.rbenv ]; then
     eval "$(rbenv init -)"
 fi
 
-if [ -e ~/.zshenv ]; then
-    # Machine local config
-    source ~/.zshenv
+# OPAM configuration
+if [ -d ~/.opam ]; then
+    . ~/.opam/opam-init/init.zsh > /dev/null 2> /dev/null || true
+    eval `opam config env`
 fi
