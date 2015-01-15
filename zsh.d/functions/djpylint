@@ -1,0 +1,5 @@
+pylint --ignore=.git --persistent=no \
+       --disable=C,R --disable=W0141,W0142,W0201,W0403 --disable=E1101,E1102 \
+       --output-format=parseable --include-symbols=yes --include-ids=yes \
+       --generated-members=objects,save,DoesNotExist,MultipleObjectsReturned,id \
+       $@

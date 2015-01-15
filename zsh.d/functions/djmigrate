@@ -1,0 +1,12 @@
+# -*- mode: sh; -*-
+
+djmigrate () {
+  
+}
+
+if [[ $options[ksh_autoload] = off ]]; then
+    # KSH_AUTOLOAD calls the inner djmigrate function as well as this
+    # outer code. When it's turned off, only the outer code runs on
+    # the first invocation, so we must call it ourselves here.
+    djmigrate "$@"
+fi

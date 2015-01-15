@@ -63,9 +63,10 @@ alias grep='grep --color=auto'
 alias nano='nano -w'
 alias memusage="ps -u $LOGNAME -o pid,rss,command | sort -n +1 -2"
 alias pycheck="python -m py_compile"
-alias django="python manage.py"
 alias dj='python manage.py'
-alias edit='emacsclient -nw --alternate-editor="" -c'
+alias djsp='python manage.py shell_plus --quiet-load'
+alias djmigrate='python manage.py migrate --merge --ignore-ghost-migrations'
+
 # Global aliases, can be specified anywhere (not just the beginning of a command)
 alias -g swapouterr='3>&1 1>&2 2>&3 3>&-'
 
