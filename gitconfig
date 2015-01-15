@@ -35,12 +35,14 @@
 [core]
 	whitespace = cr-at-eol
 	excludesfile = ~/.gitignore
+	pager = less -F -X
 [branch]
 	autosetuprebase = always
 [push]
-	default = current
-
+	default = upstream
 [include]
 	path = .gitconfig.local
 [rebase]
 	autosquash = true
+[help]
+	autocorrect = 5
