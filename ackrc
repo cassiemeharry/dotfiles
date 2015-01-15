@@ -1,3 +1,4 @@
+--column
 --ignore-dir=migrations
 --ignore-dir=node_modules
 --type-add
