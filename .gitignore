@@ -8,3 +8,4 @@ emacs.d/server/server
 emacs.d/tramp
 ssh
 zsh.d/venvs
+emacs.d/init/nickmeharry.el

@@ -1,76 +1,19 @@
-(add-to-list 'load-path "~/.emacs.d")
+;; Load org-mode to load main configuration
+(package-initialize t)
+(add-to-list 'load-path "~/.emacs.d/init")
 (add-to-list 'load-path "~/.emacs.d/lang-modes")
 
-;; Helper Functions
-(defun chomp (str)
-  "Chomp leading and tailing whitespace from STR."
-  (while (string-match "\\`\n+\\|^\\s-+\\|\\s-+$\\|\n+\\'"
-                       str)
-    (setq str (replace-match "" t t str)))
-  str)
-
-(defun all (predicate lst)
-  "Return either 't or 'nil whether all items in a list pass a given predicate"
-  (cond ((null lst) 't)
-        ('t (if (funcall predicate (car lst))
-                (all predicate (cdr lst))
-              'nil))))
-
-(defun file-lines (file)
-  "Read a file and return lines as a list."
-  (with-temp-buffer
-    (insert-file-contents file)
-    (split-string (buffer-string) "\n")))
-
-(defun file-first-line (file)
-  "Read the first line from a file. Handy for passwords."
-  (chomp (car (file-lines file))))
-
-;; Disable backgrounding emacs with C-z.
-(global-unset-key [(control z)])
-(global-unset-key [(control x)(control z)])
-
-;; Make C-a smarter
-(defun smarter-move-beginning-of-line (arg)
-  "Move point back to indentation of beginning of line.
-
-Move point to the first non-whitespace character on this line.
-If point is already there, move to the beginning of the line.
-Effectively toggle between the first non-whitespace character and
-the beginning of the line.
-
-If ARG is not nil or 1, move forward ARG - 1 lines first.  If
-point reaches the beginning or end of the buffer, stop there."
-  (interactive "^p")
-  (setq arg (or arg 1))
-
-  ;; Move lines first
-  (when (/= arg 1)
-    (let ((line-move-visual nil))
-      (forward-line (1- arg))))
-
-  (let ((orig-point (point)))
-    (back-to-indentation)
-    (when (= orig-point (point))
-      (move-beginning-of-line 1))))
-
-;; remap C-a to `smarter-move-beginning-of-line'
-(global-set-key [remap move-beginning-of-line]
-                'smarter-move-beginning-of-line)
-
-;; Highlight selections (marks)
-(setq transient-mark-mode t)
-;; Highlight trailing spaces and all tabs
-(global-whitespace-mode t)
-
-;; Watch all files and revert buffers whose backing files have changed.
-(global-auto-revert-mode t)
+(load "nickmeharry-helpers")
 
 ;; Don't clutter the filesystem with *~ files
-(setq backup-directory-alist
-      `((".*" . ,temporary-file-directory))
-      auto-save-file-name-transforms
-      `((".*" ,temporary-file-directory)))
+(setq
+   backup-by-copying t  ; Don't clobber symlinks
+   backup-directory-alist
+     `((".*" . ,temporary-file-directory))
+   delete-old-versions t
+   kept-new-versions 6
+   kept-old-versions 2
+   version-control t)
 
 (defun clean-backup-files ()
   (let ((week (* 60 60 24 7))
@@ -102,14 +45,6 @@ point reaches the beginning or end of the buffer, stop there."
 ;; Start in *scratch* instead of the splash screen
 (setq inhibit-splash-screen t)
 
-;; Cursor position helpers
-(setq linum-format "%4d ")
-(global-linum-mode t)
-(column-number-mode t)
-(setq scroll-error-top-bottom 'true)
-(ignore-errors
-  (load-theme 'tango-dark t))
-
 ;; Load remote files over SSH
 (setq tramp-default-method "ssh")
 
@@ -123,16 +58,15 @@ point reaches the beginning or end of the buffer, stop there."
       "http://melpa.milkbox.net/packages/"))
 (package-initialize)
 (defvar my-packages
-  '(ack
-    dash-at-point
+  '(ack-and-a-half
     exec-path-from-shell
     elixir-mode elixir-mix
     flymake flymake-cursor flymake-jshint
     find-file-in-repository
     haste
     magit
+    mo-git-blame
     markdown-mode
-    minimap
     multiple-cursors
     puppet-mode
     python-mode
@@ -142,9 +76,22 @@ point reaches the beginning or end of the buffer, stop there."
     web-mode
     zencoding-mode
     s
-    f))
+    f
+    smex
+    xterm-frobs))
+
 (defun my-packages-installed-p ()
-  (all 'package-installed-p my-packages))
+  (nm/all 'package-installed-p my-packages))
+(defun package-list-unaccounted-packages ()
+  "Like `package-list-packages', but shows only the packages that
+  are installed and are not in `jpk-packages'.  Useful for
+  cleaning out unwanted packages."
+  (interactive)
+  (message "%s"
+   (remove-if-not (lambda (x) (and (not (memq x my-packages))
+                            (not (package-built-in-p x))
+                            (package-installed-p x)))
+                  (mapcar 'car package-archive-contents))))
 
 ; Install packages not currently installed
 (if (my-packages-installed-p)
@@ -221,11 +168,7 @@ the checking happens for all pairs in auto-minor-mode-alist"
 (autoload 'jinja2-mode "jinja2-mode" "Major mode for the Jinja2 Template Language" t)
 (add-to-list 'auto-mode-alist '("\\.hl7$" . jinja2-mode))
 
-; Web mode
-;   Combines HTML, CSS, and JS modes in a reletively sane manner.
-(autoload 'web-mode "web-mode" "Major mode for HTML5/JS/CSS" t)
-(add-to-list 'auto-mode-alist '("\\.html$" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.htm$" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
 
 ; Extra Python extensions
 (add-to-list 'auto-mode-alist '("\\.wsgi$" . python-mode))
@@ -238,16 +181,17 @@ the checking happens for all pairs in auto-minor-mode-alist"
 (epa-file-name-regexp-update)
 
 ; Objective-C
-(defun is-h-file-objc? ()
-  (let* ((file-path (buffer-file-name))
-         (file-ext (or (and (stringp file-path) (downcase (file-name-extension file-path))) ""))
-         (m-file (concat (file-name-sans-extension file-path) ".m"))
-         (mm-file (concat (file-name-sans-extension file-path) ".mm")))
-    (and (string= file-ext "h")
-         (or (file-exists-p m-file)
-             (file-exists-p mm-file)
-             (directory-files (file-name-directory file-path) t (regexp-opt '("\.xib" "\.xcodeproj")))))))
-(add-to-list 'magic-mode-alist '(is-h-file-objc? . objc-mode))
+;;(defun is-h-file-objc? ()
+;;   (let* ((file-path (buffer-file-name))
+;;          (file-ext (or (and (stringp file-path) (downcase (file-name-extension file-path))) ""))
+;;          (m-file (concat (file-name-sans-extension file-path) ".m"))
+;;          (mm-file (concat (file-name-sans-extension file-path) ".mm")))
+;;     (and (string= file-ext "h")
+;;          (or (file-exists-p m-file)
+;;              (file-exists-p mm-file)
+;;              (directory-files (file-name-directory file-path) t (regexp-opt '("\.xib" "\.xcodeproj")))))))
+;; nil)
+;; (add-to-list 'magic-mode-alist '(is-h-file-objc? . objc-mode))
 (add-to-list 'auto-mode-alist '("\\.mm?$" . objc-mode))
 
 ; JS/Flymake
@@ -255,43 +199,41 @@ the checking happens for all pairs in auto-minor-mode-alist"
 ;(add-hook 'javascript-mode-hook
 ;  (lambda () (flymake-mode t)))
 
-(require 'multiple-cursors)
-(global-set-key (kbd "M-N") 'mc/mark-next-like-this)
-(global-set-key (kbd "M-P") 'mc/mark-previous-like-this)
-(global-set-key (kbd "C-c C-SPC") 'mc/mark-all-like-this)
-
 (setq vc-follow-symlinks t)
-
-(require 'ido)
-(ido-mode t)
-
-(global-set-key (kbd "C-x C-b") 'ibuffer)
-;; Ensure ibuffer opens with point at the current buffer's entry.
-(defadvice ibuffer
-  (around ibuffer-point-to-most-recent) ()
-  "Open ibuffer with cursor pointed to most recent buffer name."
-  (let ((recent-buffer-name (buffer-name)))
-    ad-do-it
-    (ibuffer-jump-to-buffer recent-buffer-name)))
-(ad-activate 'ibuffer)
-
-; Recent files
-(require 'recentf)
-(setq recentf-max-saved-items 200
-      recentf-max-menu-items 15)
-(recentf-mode t)
-
-(defun recentf-ido-find-file ()
-  "Find a recent file using ido."
-  (interactive)
-  (let ((file (ido-completing-read "Choose recent file: " recentf-list nil t)))
-    (when file
-      (find-file file))))
-
-(global-set-key (kbd "C-c f") 'recentf-ido-find-file)
 
 ; Flyspell
 ;   Check my spelling while editing both text (C-c f) and code (C-c F).
+(defun nm/autocorrect-prev-word ()
+  "Autocorrects the previous word, wrapping in an undo marker if changed.
+Meant to be bound to SPACE
+"
+  (interactive)
+  (insert " ")
+  (ispell-set-spellchecker-params)
+  (ispell-accept-buffer-local-defs)
+  (let ((cursor-location (point))
+        (word (ispell-get-word nil))
+        start end poss new-word replace)
+    (setq start (car (cdr word))
+          end (car (cdr (cdr word)))
+          word (car word))
+    (ispell-send-string "%\n") ; verbose mode
+    (ispell-send-string (concat "^" word "\n"))
+    (while (progn ; wait for ispell
+             (ispell-accept-output)
+             (not (string= "" (car ispell-filter)))))
+    (setq ispell-filter (car (cdr ispell-filter))) ; remove extra \n
+    (setq poss (ispell-parse-output ispell-filter))
+    (when (and (listp poss) (not (cadddr poss)) (caddr poss))
+      (setq new-word (caaddr poss))
+      (message "Replacing %S with %S" word new-word)
+      (delete-backward-char (- (marker-position end)
+                               (marker-position start)
+                               -1))
+      (insert " ")
+      (insert new-word))))
+;; (add-hook 'flyspell-mode-hook (lambda ()
+;;   (local-set-key (kbd "SPC") 'nm/autocorrect-prev-word)))
 (setq ispell-program-name "aspell")
 (global-set-key (kbd "C-c f")
   (lambda ()
@@ -336,10 +278,31 @@ the checking happens for all pairs in auto-minor-mode-alist"
       (beginning-of-line)
       (setq latest-file (buffer-substring-no-properties (point) (point-max)))
       (load-file latest-file))))
-(if (file-expand-wildcards "~/.opam/*/share/typerex/ocp-indent/ocp-indent.el"))
 
 ;; Magit, a Git frontend
 (global-set-key (kbd "C-x g") 'magit-status)
+(global-set-key (kbd "C-c g b") 'mo-git-blame-current)
+(global-set-key (kbd "C-c g f") 'mo-git-blame-file)
+
+;; (defun ansi-color-apply-on-buffer (&optional buffer)
+;;   (interactive)
+;;   (with-current-buffer (or buffer (current-buffer))
+;;     (let ((original-bro buffer-read-only))
+;;       (setq buffer-read-only nil)
+;;       (ansi-color-apply-on-region (point-min) (point-max))
+;;       (setq buffer-read-only original-bro))))
+
+;; (defun ansify-magit-process-buffer ()
+;;   (let ((buffer (car (nm/filter (lambda (b) (string-equal (buffer-name b) "*magit-process*"))
+;;                              (buffer-list)))))
+;;     (when buffer
+;;       (save-excursion
+;;         (set-buffer buffer)
+;;         (make-local-variable 'after-change-functions)
+;;         (add-hook 'after-change-functions
+;;                   (lambda (start end length)
+;;                     (ansi-color-apply-on-buffer (current-buffer))))))))
+;; (add-hook 'buffer-list-update-hook 'ansify-magit-process-buffer)
 
 ;; Elixir, a Ruby-like language for the Erlang VM
 (setq-default elixir-mode-map (make-keymap))
@@ -402,19 +365,9 @@ the checking happens for all pairs in auto-minor-mode-alist"
       (find-file (concat "/sudo:root@localhost:"
                          (ido-read-file-name "Find file (as root): ")))
     (find-alternate-file (concat "/sudo:root@localhost:" buffer-file-name))))
-(global-set-key (kbd "C-x C-r") 'sudo-edit)
+; (global-set-key (kbd "C-x C-r") 'sudo-edit)
 
 (global-set-key (kbd "H-[ h]") 'move-beginning-of-line)
-
-(defun single-window-with-minimap ()
-  (interactive)
-  (if (not (window-system))
-      (message "Can not show minimap in terminal window")
-    (delete-other-windows)
-    (linum-mode nil)
-    (minimap-create)
-    (linum-mode t)))
-(global-set-key (kbd "M-M") 'single-window-with-minimap)
 
 ; Fill and spell check git commit messages.
 (add-to-list 'auto-minor-mode-alist '("COMMIT_EDITMSG" . auto-fill-mode))
@@ -426,53 +379,102 @@ the checking happens for all pairs in auto-minor-mode-alist"
 (add-to-list 'auto-minor-mode-alist '("\\.sass" . rainbow-mode))
 (add-to-list 'auto-minor-mode-alist '("\\.scss" . rainbow-mode))
 
-(add-hook 'org-mode-hook 'auto-fill-mode)
+(add-to-list 'load-path "~/.emacs.d/repos/habitrpg")
+(require 'habitrpg)
+(setq habitrpg-api-user  "2e85d2f4-488d-45e7-bdff-f3f068491afe"
+      habitrpg-api-token "d8303938-1d83-4ae1-937b-0ce0817b2117")
+(global-set-key (kbd "C-c C-x h") 'habitrpg-add)
+(global-set-key (kbd "<f9> a") 'habitrpg-status)
+
+(defvar bzg-big-fringe-mode nil)
+(define-minor-mode bzg-big-fringe-mode
+  "Minor mode to hide the mode-line in the current buffer."
+  :init-value nil
+  :global t
+  :variable bzg-big-fringe-mode
+  :group 'editing-basics
+  (if (not bzg-big-fringe-mode)
+      (set-fringe-style nil)
+    (set-fringe-mode
+     (/ (- (frame-pixel-width)
+                  (* 125 (frame-char-width)))
+               2))))
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(ack-and-a-half-mode-type-alist (quote ((python-mode "python"))))
  '(clean-buffer-list-delay-general 1)
+ '(completion-ignored-extensions
+   (quote
+    (".beam" ".vee" ".jam" ".annot" ".cmi" ".cmxa" ".cma" ".cmx" ".cmo" ".o" "~" ".bin" ".lbin" ".so" ".a" ".ln" ".blg" ".bbl" ".elc" ".lof" ".glo" ".idx" ".lot" ".svn/" ".hg/" ".git/" ".bzr/" "CVS/" "_darcs/" "_MTN/" ".fmt" ".tfm" ".class" ".fas" ".lib" ".mem" ".x86f" ".sparcf" ".dfsl" ".pfsl" ".d64fsl" ".p64fsl" ".lx64fsl" ".lx32fsl" ".dx64fsl" ".dx32fsl" ".fx64fsl" ".fx32fsl" ".sx64fsl" ".sx32fsl" ".wx64fsl" ".wx32fsl" ".fasl" ".ufsl" ".fsl" ".dxl" ".lo" ".la" ".gmo" ".mo" ".toc" ".aux" ".cp" ".fn" ".ky" ".pg" ".tp" ".vr" ".cps" ".fns" ".kys" ".pgs" ".tps" ".vrs" ".pyc" ".pyo" ".byte" ".native")))
+ '(custom-safe-themes
+   (quote
+    ("3a727bdc09a7a141e58925258b6e873c65ccf393b2240c51553098ca93957723" "6a37be365d1d95fad2f4d185e51928c789ef7a4ccf17e7ca13ad63a8bf5b922f" default)))
  '(delete-selection-mode t)
  '(electric-indent-mode nil)
  '(electric-pair-mode t)
  '(flymake-gui-warnings-enabled nil)
  '(flymake-no-changes-timeout 3)
+ '(git-commit-summary-max-length 70)
+ '(global-fci-mode t)
  '(ido-enable-flex-matching t)
  '(ido-everywhere t)
  '(ido-use-filename-at-point (quote guess))
  '(ido-use-url-at-point t)
+ '(idris-interpreter-path "~/.cabal/bin/idris")
  '(indent-tabs-mode nil)
  '(initial-scratch-message "
 ")
- '(js-indent-level 2)
+ '(js2-basic-offset 2)
+ '(js2-bounce-indent-p t)
+ '(js2-strict-trailing-comma-warning nil)
  '(midnight-hook (quote (clean-buffer-list clean-backup-files)))
  '(midnight-mode t nil (midnight))
- '(minimap-dedicated-window t)
- '(minimap-update-delay 0.1)
- '(minimap-window-location (quote right))
  '(mouse-wheel-progressive-speed nil)
  '(mouse-wheel-scroll-amount (quote (1)))
- '(org-export-latex-hyperref-options-format "\\hypersetup{
-  pdfkeywords={%s},
-  pdfsubject={%s},
-  pdfcreator={Emacs Org-mode version %s},
-  colorlinks=true}
-")
- '(org-export-latex-packages-alist nil)
+ '(safe-local-variable-values
+   (quote
+    ((encoding . utf-8)
+     (jedi:server-args "--virtual-env" "/Users/nick/code/opw")
+     (jedi:server-args "--virtual-env" "/Users/nick/code/dc-web"))))
  '(scroll-bar-mode nil)
  '(tab-width 4)
  '(tool-bar-mode nil)
  '(uniquify-buffer-name-style (quote post-forward-angle-brackets) nil (uniquify))
  '(visible-bell t)
  '(whitespace-global-modes (quote (not web-mode)))
- '(whitespace-style (quote (face tabs trailing space-before-tab space-after-tab tab-mark))))
+ '(whitespace-style
+   (quote
+    (face tabs trailing space-before-tab space-after-tab tab-mark))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(markdown-pre-face ((t (:inherit font-lock-constant-face :foreground "green")))))
+ '(default ((t (:inherit nil :background "#2e3436" :foreground "#eeeeec" :slant normal :weight normal :height 120 :width normal :foundry "apple" :family "Monaco"))))
+ '(idris-loaded-region-face ((t nil)))
+ '(idris-log-timestamp-face ((t (:foreground "Sky Blue-3" :weight bold))))
+ '(idris-prover-processed-face ((t (:inverse-video t))))
+ '(idris-semantic-type-face ((t (:foreground "Sky Blue-2"))))
+ '(magit-diff-add ((t (:inherit diff-added :foreground "#729fcf"))))
+ '(magit-item-highlight ((t (:inverse-video nil :box nil :slant oblique :weight extra-bold))))
+ '(markdown-pre-face ((t (:inherit font-lock-constant-face :foreground "green"))))
+ '(term-bold ((t (:weight extra-bold))))
+ '(term-color-black ((t (:background "Aluminium-6" :foreground "Aluminium-4"))))
+ '(term-color-blue ((t (:background "Sky Blue-3" :foreground "Sky Blue-1"))))
+ '(term-color-cyan ((t (:background "cyan3" :foreground "light cyan"))))
+ '(term-color-green ((t (:background "Chameleon-3" :foreground "Chameleon-2"))))
+ '(term-color-magenta ((t (:background "Plum-3" :foreground "Plum-1"))))
+ '(term-color-red ((t (:background "Scarlet Red-3" :foreground "Scarlet Red-1"))))
+ '(term-color-white ((t (:background "Aluminium-2" :foreground "Aluminium-1"))))
+ '(term-color-yellow ((t (:background "Butter-3" :foreground "Butter-2")))))
 (put 'upcase-region 'disabled nil)
 (put 'narrow-to-region 'disabled nil)
+(put 'erase-buffer 'disabled nil)
+
+(require 'org)
+(require 'ob-tangle)
+(org-babel-load-file (expand-file-name "~/.emacs.d/init/nickmeharry.org"))

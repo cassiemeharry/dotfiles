@@ -1,0 +1,397 @@
+#+TITLE: Nick Meharry's Emacs Configuration
+#+LaTeX_HEADER: \usepackage{listings}
+#+LaTeX_HEADER: \lstnewenvironment{common-lispcode}
+#+LaTeX_HEADER: \lstset{language={Lisp},basicstyle={\ttfamily\footnotesize},frame=single,breaklines=true}
+#+OPTIONS: toc:4 h:4
+
+#+name: setup-listings
+#+begin_src emacs-lisp :exports both :results silent :tangle no
+  (setq org-export-latex-listings 'listings)
+  (setq org-export-latex-custom-lang-environments
+        '((emacs-lisp "common-lispcode")))
+  (setq org-export-latex-listings-options
+        '(("frame" "lines")
+          ("basicstyle" "\\footnotesize")
+          ("numbers" "left")
+          ("numberstyle" "\\tiny")))
+  (setq org-latex-to-pdf-process
+        '("pdflatex -interaction nonstopmode -output-directory %o %f"
+        "pdflatex -interaction nonstopmode -output-directory %o %f"
+        "pdflatex -interaction nonstopmode -output-directory %o %f"))
+  (org-add-link-type
+   "latex" nil
+   (lambda (path desc format)
+     (cond
+      ((eq format 'html)
+       (format "<span class=\"%s\">%s</span>" path desc))
+      ((eq format 'latex)
+       (format "\\%s{%s}" path desc)))))
+#+end_src
+
+* Prelude
+** About this file
+This file is based on [[https://dl.dropboxusercontent.com/u/3968124/sacha-emacs.org][Sacha Chua's Emacs configuration]].
+
+** Setup
+This part goes in =~/.emacs.d/init.el=:
+
+#+name: Package init
+#+begin_src emacs-lisp :tangle no
+  ;; Load org-mode to load main configuration
+  (package-initialize t)
+  (require 'org)
+  (require 'ob-tangle)
+  (org-babel-load-file (expand-file-name "~/.emacs.d/nickmeharry.org"))
+#+end_src
+
+** Personal information
+#+begin_src emacs-lisp
+  (setq user-full-name "Nick Meharry"
+        user-mail-address "nick@nickmeharry.com")
+#+end_src
+
+** Secrets
+
+This file is going to be a public part of my dotfiles repo, but it
+needs access to passwords and the like that shouldn't be
+published. I've written a short wrapper over Emacs's native file
+encryption, so I can keep those with my repo, but essentially private.
+
+#+begin_src emacs-lisp
+  ;; (require 'secrets)
+  ;; (nm/get-secret 'secret-name) loads the given secret from the
+  ;; encrypted "secrets.el.gpg" file. (nm/apply-secret 'secret-name) is
+  ;; equivalent to (setq secret-name (nm/get-secret 'secret-name))
+#+end_src
+
+* Packages
+** Setup Package Loading
+I use package.el to install new code. The execption to this is
+[[https://github.com/jwiegley/use-package][=use-package=]], which handles downloading and installing packages as
+necessary.
+
+#+begin_src emacs-lisp
+  (add-to-list 'load-path "~/.emacs.d/site-lisp")
+
+  (require 'use-package)
+
+  (add-to-list 'package-archives
+      '("melpa" .
+        "http://melpa.milkbox.net/packages/"))
+#+end_src
+
+* Interface
+** Interactively Do Things
+=ido-mode= provides a form of autocomplete for pretty much everything
+that uses the minibuffer. Really useful.
+
+#+begin_src emacs-lisp
+  (use-package ido
+    :init (progn
+      (ido-mode t)
+      ; (defadvice ido-set-matches-1 (after ido-acronym-matches activate)
+      ;   (if (> (length ido-text) 1)
+      ;       (let ((regex (concat "^" (mapconcat 'char-to-string ido-text "[^-]*-")
+      ;                            "[^-]*$")))
+      ;         (setq ad-return-value
+      ;               (append (reverse (remove-if-not (lambda (i) (string-match regex (car i))) items))
+      ;                       ad-return-value)))))
+      ))
+#+end_src
+** Smart M-x
+This sorts IDO's list when entering commands via =M-x= by most
+recently used, so the commands I need are right there.
+
+#+begin_src emacs-lisp
+  (defun smex-do-m-x ()
+    (interactive)
+    (or (boundp 'smex-cache)
+        (smex-initialize))
+    (global-set-key (kbd "M-x") 'smex)
+    (smex))
+  (defun smex-do-m-s-x ()
+    (interactive)
+    (or (boundp 'smex-cache)
+        (smex-initialize))
+    (global-set-key (kbd "M-X") 'smex-major-mode-commands)
+    (smex-major-mode-commands))
+  (use-package smex
+    :bind (("M-x" . smex-do-m-x)
+           ("M-X" . smex-do-m-s-x))
+    :init (progn
+      (defadvice smex (around space-inserts-hyphen activate compile)
+        (let ((ido-cannot-complete-command
+               `(lambda ()
+                  (interactive)
+                  (if (string= " " (this-command-keys))
+                      (insert ?-)
+                    (funcall ,ido-cannot-complete-command)))))
+          ad-do-it))
+
+      (defun smex-update-after-load (unused)
+        (when (boundp 'smex-cache)
+          (smex-update)))
+      (add-hook 'after-load-functions 'smex-update-after-load)))
+#+end_src
+** Colors
+There are a couple of themes based on the [[http://tango.freedesktop.org/Tango_Icon_Theme_Guidelines][Tango pallette]]. The one I
+like (that's been updated recently) is called =tangotango=.
+
+#+begin_src emacs-lisp
+  (use-package tangotango-theme
+    :ensure tangotango-theme
+    :if window-system
+    :init (load-theme 'tangotango t))
+#+end_src
+
+** Highlighting
+Enable =global-whitespace-mode= to highlight trailing spaces.
+
+#+begin_src emacs-lisp
+  (global-whitespace-mode t)
+#+end_src
+
+Highlight selections (active region mark).
+
+#+begin_src emacs-lisp
+  (setq transient-mark-mode t)
+#+end_src
+
+** Line and column numbering
+#+begin_src emacs-lisp
+  (setq linum-format "%4d ")
+  (global-linum-mode t)
+  (column-number-mode t)
+#+end_src
+
+** Cursor movement
+When paging around, hit the beginning or end of the buffer before
+signaling an error.
+
+#+begin_src emacs-lisp
+  (setq scroll-error-top-bottom 't)
+#+end_src
+
+Make =C-a= more useful by either moving to the beginning of the
+physical line, or jumping to the first non-whitespace character.
+
+#+begin_src emacs-lisp
+  (defun smarter-move-beginning-of-line (arg)
+    ;; Taken from Emacs Redux
+    (interactive "^p")
+    (setq arg (or arg 1))
+
+    ;; Move lines first
+    (when (/= arg 1)
+      (let ((line-move-visual nil))
+        (forward-line (1- arg))))
+
+    (let ((orig-point (point)))
+      (back-to-indentation)
+      (when (= orig-point (point))
+        (move-beginning-of-line 1))))
+
+  (global-set-key [remap move-beginning-of-line]
+                  'smarter-move-beginning-of-line)
+
+  (bind-key (kbd "C-x p") (lambda () (interactive) (other-window -1)))
+#+end_src
+
+Jumping to where I'm looking is a really common action, and [[http://www.emacswiki.org/emacs/AceJump][ace-jump-mode]]
+makes this really fast.
+
+#+begin_src emacs-lisp
+  (use-package ace-jump-mode
+    :bind ("C-c SPC" . ace-jump-mode)
+    :idle (setq ace-jump-mode-submode-list
+                '(ace-jump-char-mode ace-jump-word-mode ace-jump-line-mode)))
+#+end_src
+
+** Window Management
+=C-z='s default behavior is really annoying, especially considering
+its proximity to =C-x=. Let's unbind that.
+
+#+begin_src emacs-lisp
+  (global-unset-key (kbd "C-z"))
+  (global-unset-key (kbd "C-x C-z"))
+#+end_src
+
+* Files and Buffers
+** Buffer List
+=ibuffer= provides a more useful buffer list.
+
+#+begin_src emacs-lisp
+  (use-package ibuffer
+    :bind ("C-x C-b" . ibuffer)
+    :init (progn
+      (defadvice ibuffer (around ibuffer-point-to-most-recent) ()
+        "Open ibuffer with cursor pointed to most recent buffer name."
+        (let ((recent-buffer-name (buffer-name)))
+          ad-do-it
+          (ibuffer-jump-to-buffer recent-buffer-name)))
+      (ad-activate 'ibuffer)))
+#+end_src
+** Recent Files
+This provides a list of recent files.
+
+#+begin_src emacs-lisp
+  (use-package recentf
+    :init (progn
+      (setq recentf-max-saved-items 200
+            recentf-max-menu-items 15)
+      (recentf-mode t))
+      (defun recentf-ido-find-file ()
+        "Find a recent file using ido."
+        (interactive)
+        (let ((file (ido-completing-read "Choose recent file: " recentf-list nil t)))
+          (when file
+            (find-file file))))
+      (global-set-key (kbd "C-c C-f") 'recentf-ido-find-file))
+#+end_src
+** Auto-revert mode
+There's very little you can do when Emacs prompts with "This file
+changed on disk. Are you sure you want to save?" This reverts saved
+buffers whenever their backing file is changed on disk to minimize
+diversion.
+
+#+begin_src emacs-lisp
+  (global-auto-revert-mode t)
+#+end_src
+** File searching
+[[http://beyondgrep.com/][Ack]] is a grep-like tool designed for searching source code. However,
+the default =ack-mode= for Emacs is rather lackluster, so I'm using
+[[https://github.com/jhelwig/ack-and-a-half][=ack-and-a-half=]] instead.
+
+#+begin_src emacs-lisp
+  (use-package ack-and-a-half
+    :ensure ack-and-a-half
+    :init (progn
+      (defalias 'ack 'ack-and-a-half)
+      (defalias 'ack-same 'ack-and-a-half-same)
+      (defalias 'ack-find-file 'ack-and-a-half-find-file)
+      (defalias 'ack-find-file-same 'ack-and-a-half-find-file-same)))
+#+end_src
+
+** Git
+#+begin_src emacs-lisp
+  (use-package magit
+    :bind (("C-x g" . magit-status)
+           ("C-c g b" . mo-git-blame-current)
+           ("C-c g f" . mo-git-blame-file)))
+#+end_src
+
+* Programming Languages
+** Python
+Use an updated =python-mode= package.
+
+#+begin_src emacs-lisp
+  (use-package python-mode
+    :disabled t
+    :pre-load (let (pm-dir (car (directory-files package-user-dir nil "python-mode-.+")))
+                (message "pm-dir = %s" pm-dir)
+                (load (concat package-user-dir pm-dir "/python-mode.el")))
+    :mode ("\\.py$" "\\.wsgi$" "\\.hl7$"))
+#+end_src
+
+** Web mode
+Web development has lots of languages mixed together in one file,
+which isn't Emacs's strong point. Fortunately, there's [[http://web-mode.org/][=web-mode=]] that
+combines the various language modes into one major mode.
+
+#+begin_src emacs-lisp
+  (use-package web-mode
+    :ensure web-mode
+    :mode (("\\.html$" . web-mode)
+           ("\\.htm$" . web-mode))
+    :init (add-hook 'web-mode-hook
+            (lambda () (electric-pair-mode -1))))
+#+end_src
+
+** JavaScript
+
+#+begin_src emacs-lisp
+  (use-package js2-mode
+    :ensure web-mode
+    :mode "\\.js$")
+#+end_src
+
+** Idris
+
+#+begin_src emacs-lisp
+  (use-package idris-mode
+    :ensure idris-mode
+    :mode "\\.idr$"
+    :init (add-to-list 'completion-ignored-extensions ".ibc"))
+#+end_src
+
+** OCaml
+
+#+begin_src emacs-lisp
+  ;; Add opam emacs directory to the load-path
+  (setq opam-share (substring (shell-command-to-string "opam config var share 2> /dev/null") 0 -1))
+  (add-to-list 'load-path (concat opam-share "/emacs/site-lisp"))
+  ;; Load merlin-mode
+  (use-package merlin
+    :init (progn
+      ;; Start merlin on ocaml files
+      (add-hook 'tuareg-mode-hook 'merlin-mode t)
+      (add-hook 'caml-mode-hook 'merlin-mode t))
+    :config (progn
+      ;; Enable auto-complete
+      (setq merlin-use-auto-complete-mode 'easy)
+      ;; Use opam switch to lookup ocamlmerlin binary
+      (setq merlin-command 'opam)))
+#+end_src
+
+* org-mode
+
+I'm going to try using =org-mode= seriously. That means managing
+things to do, checklists, and calendar.
+
+** HabitRPG
+#+begin_src emacs-lisp
+  ; (add-to-list 'load-path )
+  ; (use-package habitrpg
+  ;   :load-path "repos/habitrpg"
+  ;   :config (progn (require 'secrets) (nm/apply-secret "habitrpg-api-user")))
+  ; (add-hook 'org-after-todo-state-change-hook 'habitrpg-add 'append)
+#+end_src
+
+** To do's
+
+#+begin_src emacs-lisp
+  (setq org-todo-keywords
+        '((sequence "TODO" "|" "DONE")
+          (sequence "BUG" "|" "FIXED" "WONTFIX")))
+#+end_src
+
+** Checklists
+** Calendar
+** Formatting
+
+#+begin_src emacs-lisp
+  (add-hook 'org-mode-hook 'auto-fill-mode)
+  (setq org-export-latex-hyperref-options-format
+   "\\hypersetup{
+    pdfkeywords={%s},
+    pdfsubject={%s},
+    pdfcreator={Emacs Org-mode version %s},
+    colorlinks=true}
+"
+        org-export-latex-packages-alist nil)
+#+end_src
+* Quality of Life
+** Pandora (via pianobar)
+=pianobar= is a command-line client to [[http://pandora.com][Pandora Internet Radio]].
+
+#+begin_src emacs-lisp
+  (use-package pianobar
+    :commands pianobar
+    :bind ("<f8>" . pianobar-play-or-pause)
+    :config
+    (progn
+      (require 'secrets)
+      (setq pianobar-username "bluejeansummer@gmail.com"
+            pianobar-password (nm/get-secret 'pianobar-password)
+            pianobar-station "Break Of Reality Radio")))
+#+end_src
