@@ -14,8 +14,32 @@ persistent=yes
 [MESSAGES CONTROL]
 # Disable the message, report, category or checker with the given id(s).
 #disable=I,C,star-args,no-member,no-init
-disable=I,C,R,bad-builtin,attribute-defined-outside-init,relative-import,fixme,star-args,no-member,no-init
-# unused-import,unused-wildcard-import,bare-except
+disable=I,
+  C,
+  R,
+  bad-builtin,
+  attribute-defined-outside-init,
+  relative-import,
+  fixme,
+  star-args,
+  no-member,
+  no-init,
+  bare-except,
+  # unused-import,
+  # unused-wildcard-import
+
+# Description of ignored messages:
+# * I:                              Notice that pylint ignored something
+# * C:                              Convention/Style
+# * R:                              Code complexity warnings
+# * bad-builtin:                    Use of builtins like map, filter, etc., rather than a list comprehension
+# * attribute-defined-outside-init: Attributes should be defined on the class or within __init__
+# * relative-import:                `import y` instead of `import .y` or `from x import y`
+# * fixme:                          "TODO", "FIXME", "XXX" comments
+# * star-args:                      *args, **kwargs
+# * no-member:                      Access to unknown attribute. Django does too much magic for this
+# * no-init:                        No __init__ method on class. Django models don't need one
+# * bare-except:                    `except:`, `except BaseException:`, or `except Exception`. Too broad.
 
 
 [REPORTS]
