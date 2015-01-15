@@ -6,6 +6,12 @@
 	glog = log --graph --all --decorate --dense --pretty=short --date=local
 	alias = config --get-regexp 'alias\\..+'
 	co = checkout
+	wip = !sh -c "'git add --update; git commit --no-verify --message WIP'"
+	unwip = !zsh -c "'if [[ $(git log -1 --format=format:\"%s\") == \"WIP\" ]]; then; git reset HEAD^; fi'"
+	rebase-on = !sh -x -c "'git add --update && git commit --no-verify --message WIP && git up && git rebase \"${1:-dev}\" && git reset HEAD^'"
+	dc = diff --cached
+	stashpop = !zsh -c "'setopt PIPE_FAIL; git stash show --patch; if read -q \"REPLY?Apply this patch? [yN] \"; then echo; git stash pop; else echo; fi'"
+	pushnew = !zsh -c "'git push -u origin $(git symbolic-ref HEAD | cut -d'/' -f3-)'"
 
 [color]
 	branch = auto
