@@ -122,6 +122,16 @@ promptMail () {
 }
 second_row_functions+=(promptMail)
 
+promptTodoDotTxt () {
+    if [[ -f $HOME/Documents/todo.txt ]]; then
+        local tasks="$(wc -l ~/Documents/todo.txt | awk '{print $1}')"
+        if [[ $tasks -gt 0 ]]; then
+            print "[\e[33mtodo\e[0m: \e[33;1m$tasks\e[0m]"
+        fi
+    fi
+}
+second_row_functions+=(promptTodoDotTxt)
+
 promptHistoryNumber () {
     print -P "[\e[36m%!\e[0m]"
 }
