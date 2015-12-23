@@ -1,9 +1,9 @@
 [submodule "emacs.d/elixir-mode"]
-	path = emacs.d/elixir-mode
+	path = emacs/.emacs.d/elixir-mode
 	url = git://github.com/elixir-lang/emacs-elixir.git
 [submodule "todotxt-mode"]
-	path = emacs.d/site-lisp/todotxt-mode
+	path = emacs/.emacs.d/site-lisp/todotxt-mode
 	url = git@github.com:avillafiorita/todotxt-mode.git
 [submodule "elm-mode"]
-	path = emacs.d/site-lisp/elm-mode
+	path = emacs/.emacs.d/site-lisp/elm-mode
 	url = git@github.com:jcollard/elm-mode.git
