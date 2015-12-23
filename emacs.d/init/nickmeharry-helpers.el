@@ -105,3 +105,30 @@
 (add-hook 'markdown-mode-hook
           (lambda ()
             (setq-local auto-fill-function 'nm/markdown-mode/auto-fill-function)))
+
+(defun clean-backup-files ()
+  (let ((week (* 60 60 24 7))
+        (current (float-time (current-time))))
+    (dolist (file (directory-files temporary-file-directory t))
+      (when (and (backup-file-name-p file)
+                 (> (- current (float-time (fifth (file-attributes file))))
+                    week))
+        (message "Deleting backup file %s" file)
+        (delete-file file)))))
+
+;; Cleanup whitespace
+(defun cleanup-dir-whitespace (directory)
+  "Clean up whitespace in all .py files in a given directory"
+  (interactive "DDirectory to clean (recursively): ")
+  (let ((py-files
+         (f-entries "~/code/opw/onpatient-web"
+                    (lambda (p) (s-ends-with? ".py" p))
+                    t)))
+    (mapcar (lambda (path)
+              (message "Processing %s..." path)
+              (with-temp-buffer
+                (insert-file-contents path)
+                (whitespace-cleanup)
+                (write-region 1 (point-max) path)))
+            py-files)
+    (message "Done, cleaned %s files" (length py-files))))

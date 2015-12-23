@@ -38,7 +38,6 @@ This part goes in =~/.emacs.d/init.el=:
 #+name: Package init
 #+begin_src emacs-lisp :tangle no
   ;; Load org-mode to load main configuration
-  (package-initialize t)
   (require 'org)
   (require 'ob-tangle)
   (org-babel-load-file (expand-file-name "~/.emacs.d/nickmeharry.org"))
@@ -58,7 +57,8 @@ published. I've written a short wrapper over Emacs's native file
 encryption, so I can keep those with my repo, but essentially private.
 
 #+begin_src emacs-lisp
-  ;; (require 'secrets)
+  (autoload 'nm/get-secret (expand-file-name "~/.emacs.d/secrets.el"))
+  (autoload 'nm/apply-secret (expand-file-name "~/.emacs.d/secrets.el"))
   ;; (nm/get-secret 'secret-name) loads the given secret from the
   ;; encrypted "secrets.el.gpg" file. (nm/apply-secret 'secret-name) is
   ;; equivalent to (setq secret-name (nm/get-secret 'secret-name))
@@ -74,10 +74,6 @@ necessary.
   (add-to-list 'load-path "~/.emacs.d/site-lisp")
 
   (require 'use-package)
-
-  (add-to-list 'package-archives
-      '("melpa" .
-        "http://melpa.milkbox.net/packages/"))
 #+end_src
 
 * Interface
@@ -87,63 +83,15 @@ that uses the minibuffer. Really useful.
 
 #+begin_src emacs-lisp
   (use-package ido
-    :init (progn
-      (ido-mode t)
-      ; (defadvice ido-set-matches-1 (after ido-acronym-matches activate)
-      ;   (if (> (length ido-text) 1)
-      ;       (let ((regex (concat "^" (mapconcat 'char-to-string ido-text "[^-]*-")
-      ;                            "[^-]*$")))
-      ;         (setq ad-return-value
-      ;               (append (reverse (remove-if-not (lambda (i) (string-match regex (car i))) items))
-      ;                       ad-return-value)))))
-      ))
+    :config (ido-mode t))
+
+  (use-package flx-ido
+    :ensure t
+    :config
+    (flx-ido-mode 1)
+    (setq ido-enable-flex-matching t)
+    (setq ido-use-faces nil))
 #+end_src
-** Smart M-x
-This sorts IDO's list when entering commands via =M-x= by most
-recently used, so the commands I need are right there.
-
-#+begin_src emacs-lisp
-  (defun smex-do-m-x ()
-    (interactive)
-    (or (boundp 'smex-cache)
-        (smex-initialize))
-    (global-set-key (kbd "M-x") 'smex)
-    (smex))
-  (defun smex-do-m-s-x ()
-    (interactive)
-    (or (boundp 'smex-cache)
-        (smex-initialize))
-    (global-set-key (kbd "M-X") 'smex-major-mode-commands)
-    (smex-major-mode-commands))
-  (use-package smex
-    :bind (("M-x" . smex-do-m-x)
-           ("M-X" . smex-do-m-s-x))
-    :init (progn
-      (defadvice smex (around space-inserts-hyphen activate compile)
-        (let ((ido-cannot-complete-command
-               `(lambda ()
-                  (interactive)
-                  (if (string= " " (this-command-keys))
-                      (insert ?-)
-                    (funcall ,ido-cannot-complete-command)))))
-          ad-do-it))
-
-      (defun smex-update-after-load (unused)
-        (when (boundp 'smex-cache)
-          (smex-update)))
-      (add-hook 'after-load-functions 'smex-update-after-load)))
-#+end_src
-** Colors
-There are a couple of themes based on the [[http://tango.freedesktop.org/Tango_Icon_Theme_Guidelines][Tango pallette]]. The one I
-like (that's been updated recently) is called =tangotango=.
-
-#+begin_src emacs-lisp
-  (use-package tangotango-theme
-    :ensure tangotango-theme
-    :if window-system
-    :init (load-theme 'tangotango t))
-#+end_src
-
 ** Highlighting
 Enable =global-whitespace-mode= to highlight trailing spaces.
 
@@ -202,8 +150,9 @@ makes this really fast.
 
 #+begin_src emacs-lisp
   (use-package ace-jump-mode
+    :ensure t
     :bind ("C-c SPC" . ace-jump-mode)
-    :idle (setq ace-jump-mode-submode-list
+    :config (setq ace-jump-mode-submode-list
                 '(ace-jump-char-mode ace-jump-word-mode ace-jump-line-mode)))
 #+end_src
 
@@ -216,26 +165,83 @@ its proximity to =C-x=. Let's unbind that.
   (global-unset-key (kbd "C-x C-z"))
 #+end_src
 
+** Emacs Server
+Emacs has a server mode, so the current emacs can be invoked to edit
+a given file. This is really handy, especially since this file is so
+big ;)
+
+#+begin_src emacs-lisp
+  (require 'server)
+  (if (and window-system (not (server-running-p)))
+    (server-start))
+#+end_src
+
 * Files and Buffers
+** Projectile
+
+#+begin_src emacs-lisp
+  (use-package projectile
+    :ensure t)
+#+end_src
+
+** Automatic Minor Modes
+I'm not entirely sure why Emacs doesn't have this already.
+
+#+begin_src emacs-lisp
+  (defvar auto-minor-mode-alist ()
+    "Alist of filename patterns vs correpsonding minor mode functions, see `auto-mode-alist'
+  All elements of this alist are checked, meaning you can enable multiple minor modes for the same regexp.")
+  (defun enable-minor-mode-based-on-extension ()
+    "check file name against auto-minor-mode-alist to enable minor modes
+  the checking happens for all pairs in auto-minor-mode-alist"
+    (when buffer-file-name
+      (let ((name buffer-file-name)
+            (remote-id (file-remote-p buffer-file-name))
+            (alist auto-minor-mode-alist))
+        ;; Remove backup-suffixes from file name.
+        (setq name (file-name-sans-versions name))
+        ;; Remove remote file name identification.
+        (when (and (stringp remote-id)
+                   (string-match-p (regexp-quote remote-id) name))
+          (setq name (substring name (match-end 0))))
+        (while (and alist (caar alist) (cdar alist))
+          (if (string-match (caar alist) name)
+              (funcall (cdar alist) 1))
+          (setq alist (cdr alist))))))
+
+  (add-hook 'find-file-hook 'enable-minor-mode-based-on-extension)
+#+end_src
+
 ** Buffer List
 =ibuffer= provides a more useful buffer list.
 
 #+begin_src emacs-lisp
   (use-package ibuffer
+    :ensure t
     :bind ("C-x C-b" . ibuffer)
-    :init (progn
-      (defadvice ibuffer (around ibuffer-point-to-most-recent) ()
-        "Open ibuffer with cursor pointed to most recent buffer name."
-        (let ((recent-buffer-name (buffer-name)))
-          ad-do-it
-          (ibuffer-jump-to-buffer recent-buffer-name)))
-      (ad-activate 'ibuffer)))
+    :config
+    (defadvice ibuffer (around ibuffer-point-to-most-recent) ()
+      "Open ibuffer with cursor pointed to most recent buffer name."
+      (let ((recent-buffer-name (buffer-name)))
+        ad-do-it
+        (ibuffer-jump-to-buffer recent-buffer-name)))
+    (ad-activate 'ibuffer))
+
+  (use-package ibuffer-projectile
+    :ensure t
+    :config
+    (add-hook 'ibuffer-hook
+      (lambda ()
+        (ibuffer-projectile-set-filter-groups)
+        (unless (eq ibuffer-sorting-mode 'alphabetic)
+          (ibuffer-do-sort-by-alphabetic)))))
 #+end_src
 ** Recent Files
 This provides a list of recent files.
 
 #+begin_src emacs-lisp
   (use-package recentf
+    :ensure t
     :init (progn
       (setq recentf-max-saved-items 200
             recentf-max-menu-items 15)
@@ -263,21 +269,104 @@ the default =ack-mode= for Emacs is rather lackluster, so I'm using
 [[https://github.com/jhelwig/ack-and-a-half][=ack-and-a-half=]] instead.
 
 #+begin_src emacs-lisp
-  (use-package ack-and-a-half
-    :ensure ack-and-a-half
-    :init (progn
-      (defalias 'ack 'ack-and-a-half)
-      (defalias 'ack-same 'ack-and-a-half-same)
-      (defalias 'ack-find-file 'ack-and-a-half-find-file)
-      (defalias 'ack-find-file-same 'ack-and-a-half-find-file-same)))
+  (defun nm/ack (orig-ack &rest args)
+    "If we're in a common major mode, add that flag to ack"
+    )
+    
+  (use-package ack
+    :ensure t
+    )
 #+end_src
 
 ** Git
+
+=find-file-in-repository= is a thin layer over =find-file= that
+uses a VC repository file listing, falling back if the current buffer
+is not in a repository.
+
+#+begin_src emacs-lisp
+  (use-package find-file-in-repository
+    :ensure t
+    :bind ("C-x C-f" . find-file-in-repository))
+#+end_src
+
+=magit= is a nice interface over the pointy =git= command line.
+
 #+begin_src emacs-lisp
   (use-package magit
+    :ensure magit
     :bind (("C-x g" . magit-status)
            ("C-c g b" . mo-git-blame-current)
            ("C-c g f" . mo-git-blame-file)))
+
+  (when (version<= "24.4" emacs-version)
+    (use-package magit-filenotify :ensure t))
+
+  ; (use-package magit-gh-pulls
+  ;   :ensure t
+  ;   :init (add-hook 'magit-mode-hook 'turn-on-magit-gh-pulls))
+#+end_src
+
+This is necessary to properly render colors in =*magit-process*=
+output buffers:
+
+#+begin_src emacs-lisp
+  (defun compilation-ansi-color-process-output ()
+    (ansi-color-process-output nil)
+    (set (make-local-variable 'comint-last-output-start)
+         (point-marker)))
+
+  (add-hook 'compilation-filter-hook #'compilation-ansi-color-process-output)
+#+end_src
+** Projectile
+
+#+begin_src emacs-lisp
+  (use-package projectile
+    :ensure t
+    :config (projectile-global-mode))
+#+end_src
+
+** sudo
+This is useful if I need to edit a file the main emacs instance
+doesn't have rights to:
+
+#+begin_src emacs-lisp
+  (defun sudo-edit (&optional arg)
+    (interactive "P")
+    (if (or arg (not buffer-file-name))
+        (find-file (concat "/sudo:root@localhost:"
+                           (ido-read-file-name "Find file (as root): ")))
+      (find-alternate-file (concat "/sudo:root@localhost:" buffer-file-name))))
+#+end_src
+
+** Dired
+Simplify making new files and directories from a dired buffer:
+
+#+begin_src emacs-lisp
+  (eval-after-load 'dired
+    '(progn
+       (define-key dired-mode-map (kbd "C-c d") 'make-directory)
+       (define-key dired-mode-map (kbd "C-c n") 'nm/dired-create-file)
+       (defun nm/dired-create-file (file)
+         "Create a file named FILE.
+If FILE already exists, signal an error."
+         (interactive
+           (list (read-file-name "Create file: " (dired-current-directory))))
+         (let* ((expanded (expand-file-name file))
+                (try expanded)
+                (dir (directory-file-name (file-name-directory expanded)))
+                new)
+           (when (file-exists-p expanded)
+             (user-error "File %s already exists" expanded))
+           (while (and try (not (file-exists-p try)) (not (equal new try)))
+             (setq new try
+                   try (directory-file-name (file-name-directory try))))
+           (when (not (file-exists-p dir))
+             (make-directory dir t))
+           (write-region "" nil expanded t nil nil t)
+           (when new
+             (dired-add-file new)
+             (dired-move-to-filename))))))
 #+end_src
 
 * Programming Languages
@@ -287,10 +376,24 @@ Use an updated =python-mode= package.
 #+begin_src emacs-lisp
   (use-package python-mode
     :disabled t
-    :pre-load (let (pm-dir (car (directory-files package-user-dir nil "python-mode-.+")))
-                (message "pm-dir = %s" pm-dir)
-                (load (concat package-user-dir pm-dir "/python-mode.el")))
+    :init
+    (let ((pm-dir (car (directory-files package-user-dir nil "python-mode-.+"))))
+      (load (concat package-user-dir pm-dir "/python-mode.el")))
     :mode ("\\.py$" "\\.wsgi$" "\\.hl7$"))
+#+end_src
+
+*** Jedi
+Use the force (by which I mean an awesome Python intelligence system).
+
+#+begin_src emacs-lisp
+  (use-package jedi
+    :ensure t
+    :init
+    (setq jedi:setup-keys t)
+    (add-hook 'python-mode-hook
+      (lambda ()
+        (if (and (boundp 'jedi:server-args) (member "--virtual-env" jedi:server-args))
+          (jedi:setup)))))
 #+end_src
 
 ** Web mode
@@ -311,7 +414,7 @@ combines the various language modes into one major mode.
 
 #+begin_src emacs-lisp
   (use-package js2-mode
-    :ensure web-mode
+    :ensure t
     :mode "\\.js$")
 #+end_src
 
@@ -327,20 +430,48 @@ combines the various language modes into one major mode.
 ** OCaml
 
 #+begin_src emacs-lisp
+  (use-package tuareg
+    :disabled t ; Package "caml" is not available on MELPA stable
+    :ensure t
+    )
+
   ;; Add opam emacs directory to the load-path
   (setq opam-share (substring (shell-command-to-string "opam config var share 2> /dev/null") 0 -1))
   (add-to-list 'load-path (concat opam-share "/emacs/site-lisp"))
   ;; Load merlin-mode
   (use-package merlin
-    :init (progn
-      ;; Start merlin on ocaml files
-      (add-hook 'tuareg-mode-hook 'merlin-mode t)
-      (add-hook 'caml-mode-hook 'merlin-mode t))
-    :config (progn
-      ;; Enable auto-complete
-      (setq merlin-use-auto-complete-mode 'easy)
-      ;; Use opam switch to lookup ocamlmerlin binary
-      (setq merlin-command 'opam)))
+    :ensure t
+    :init ;; Start merlin on ocaml files
+    (add-hook 'tuareg-mode-hook 'merlin-mode t)
+    (add-hook 'caml-mode-hook 'merlin-mode t)
+    :config
+    (setq merlin-use-auto-complete-mode 'easy) ;; Enable auto-complete
+    (setq merlin-command 'opam))               ;; Use opam switch to lookup ocamlmerlin binary
+#+end_src
+** Markdown
+#+begin_src emacs-lisp
+  (use-package markdown-mode
+    :ensure t
+    :config
+    (add-hook 'markdown-mode-hook 'auto-fill-mode)
+    (if (file-exists-p "~/.cabal/bin/pandoc")
+      (add-hook 'markdown-mode-hook #'(lambda () (setq markdown-command "~/.cabal/bin/pandoc --smart --from=markdown --to=html5")))))
+  (use-package ac-emoji
+    :ensure t
+    :config
+    (add-hook 'markdown-mode-hook 'ac-emoji-setup)
+    (add-hook 'git-commit-mode-hook 'ac-emoji-setup))
+#+end_src
+
+** Agda
+#+begin_src emacs-lisp
+  (ignore-errors
+    (with-temp-buffer
+      (let* ((coding-system-for-read 'utf-8)
+             (retval (call-process "agda-mode" nil (current-buffer) nil "locate"))
+             (filename (buffer-string)))
+        (when (= retval 0)
+          (load-file filename)))))
 #+end_src
 
 * org-mode
@@ -348,21 +479,33 @@ combines the various language modes into one major mode.
 I'm going to try using =org-mode= seriously. That means managing
 things to do, checklists, and calendar.
 
-** HabitRPG
-#+begin_src emacs-lisp
-  ; (add-to-list 'load-path )
-  ; (use-package habitrpg
-  ;   :load-path "repos/habitrpg"
-  ;   :config (progn (require 'secrets) (nm/apply-secret "habitrpg-api-user")))
-  ; (add-hook 'org-after-todo-state-change-hook 'habitrpg-add 'append)
-#+end_src
-
 ** To do's
 
 #+begin_src emacs-lisp
   (setq org-todo-keywords
         '((sequence "TODO" "|" "DONE")
           (sequence "BUG" "|" "FIXED" "WONTFIX")))
+#+end_src
+
+** GTD
+
+This is based on
+[[http://members.optusnet.com.au/~charles57/GTD/gtd_workflow.html]].
+
+#+begin_src emacs-lisp
+  (defcustom nm/gtd-folder (substitute-in-file-name "$HOME/Documents/gtd/")
+    "Folder to search for GTD files"
+    :group 'nickmeharry
+    :type 'directory)
+  (defun gtd ()
+    (interactive)
+    (let ((files '("new.org" "someday.org")))
+      (if (not (file-exists-p nm/gtd-folder))
+          (error "Could not find GTD folder %S" nm/gtd-folder)
+        (mapc (lambda (basename) (find-file-noselect (concat nm/gtd-folder basename)))
+              files)
+        (switch-to-buffer (car files))
+        (org-agenda-list))))
 #+end_src
 
 ** Checklists
@@ -379,19 +522,49 @@ things to do, checklists, and calendar.
     colorlinks=true}
 "
         org-export-latex-packages-alist nil)
+
+  (use-package org-bullets
+    :init (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
 #+end_src
-* Quality of Life
-** Pandora (via pianobar)
-=pianobar= is a command-line client to [[http://pandora.com][Pandora Internet Radio]].
+* Emacs Internals
+** GC Tuning
+#+begin_src emacs-lisp
+  (setq gc-cons-threshold 20000000)
+#+end_src
+
+** Environment Variables
+#+begin_src emacs-lisp
+  (use-package exec-path-from-shell
+    :ensure t
+    :if (not (eq system-type 'windows-nt))
+    :config
+    (exec-path-from-shell-initialize))
+#+end_src
+
+* drchrono specific
+** JIRA ticket at point
+Open a JIRA ticket like thing at point.
 
 #+begin_src emacs-lisp
-  (use-package pianobar
-    :commands pianobar
-    :bind ("<f8>" . pianobar-play-or-pause)
-    :config
-    (progn
-      (require 'secrets)
-      (setq pianobar-username "bluejeansummer@gmail.com"
-            pianobar-password (nm/get-secret 'pianobar-password)
-            pianobar-station "Break Of Reality Radio")))
+  (defcustom nm/jira-ticket-at-point-projects '("DW" "OW" "HAC" "IPADEHR")
+    "List of projects that are valid for nm/jira-ticket-at-point"
+    :group 'nickmeharry
+    :type '(repeat string))
+  (defun nm/jira-ticket-at-point--regexp ()
+    (concat
+      "\\("
+      (mapconcat 'identity nm/jira-ticket-at-point-projects "\\|")
+      "\\)-[0-9]+"))
+  (defun nm/jira-ticket-at-point (&optional ticket)
+    (interactive
+      (list
+        (let ((line (or (thing-at-point 'line) "")))
+          (set-text-properties 0 (length line) nil line)
+          (if (string-match (nm/jira-ticket-at-point--regexp) line)
+              (match-string 0 line)
+            (read-string "JIRA ticket: " nil 'nm/jira-ticket-at-point-history)))))
+    (when (not (string-match (concat "^" (nm/jira-ticket-at-point--regexp) "$") ticket))
+      (user-error "Invalid JIRA ticket %S" ticket))
+    (browse-url (concat "https://drchrono.atlassian.net/browse/" ticket)))
+  (global-set-key (kbd "C-c j") 'nm/jira-ticket-at-point)
 #+end_src

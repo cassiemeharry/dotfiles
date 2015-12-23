@@ -1,4 +1,4 @@
-(load-library "secrets.el.gpg")
+(load-library "~/.emacs.d/secrets.el.gpg")
 
 (defun nm/get-secret (name)
   (let* ((name (if (symbolp name) (symbol-name name) name))
@@ -9,4 +9,4 @@
   (set (if (stringp name) (intern name) name)
        (nm/get-secret name)))
 
-(provide 'secrets)
+(provide 'nm/secrets)
