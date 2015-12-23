@@ -4,10 +4,10 @@
                            "~/.emacs.d/site-lisp"
                            "/usr/local/share/emacs/site-lisp")))
   (mapc (lambda (default-directory)
-	  (when (file-exists-p default-directory)
-	    (add-to-list 'load-path default-directory)
-	    (normal-top-level-add-subdirs-to-load-path)))
-	custom-path-roots))
+      (when (file-exists-p default-directory)
+        (add-to-list 'load-path default-directory)
+        (normal-top-level-add-subdirs-to-load-path)))
+    custom-path-roots))
 
 (load "nickmeharry-helpers")
 
@@ -146,7 +146,7 @@ Meant to be bound to SPACE
     (".beam" ".vee" ".jam" ".annot" ".cmi" ".cmxa" ".cma" ".cmx" ".cmo" ".o" "~" ".bin" ".lbin" ".so" ".a" ".ln" ".blg" ".bbl" ".elc" ".lof" ".glo" ".idx" ".lot" ".svn/" ".hg/" ".git/" ".bzr/" "CVS/" "_darcs/" "_MTN/" ".fmt" ".tfm" ".class" ".fas" ".lib" ".mem" ".x86f" ".sparcf" ".dfsl" ".pfsl" ".d64fsl" ".p64fsl" ".lx64fsl" ".lx32fsl" ".dx64fsl" ".dx32fsl" ".fx64fsl" ".fx32fsl" ".sx64fsl" ".sx32fsl" ".wx64fsl" ".wx32fsl" ".fasl" ".ufsl" ".fsl" ".dxl" ".lo" ".la" ".gmo" ".mo" ".toc" ".aux" ".cp" ".fn" ".ky" ".pg" ".tp" ".vr" ".cps" ".fns" ".kys" ".pgs" ".tps" ".vrs" ".pyc" ".pyo" ".byte" ".native")))
  '(custom-safe-themes
    (quote
-    ("3a727bdc09a7a141e58925258b6e873c65ccf393b2240c51553098ca93957723" "6a37be365d1d95fad2f4d185e51928c789ef7a4ccf17e7ca13ad63a8bf5b922f" default)))
+    ("df96ff3758b4ffed868bd09046a7cbac239b88c0c125062b2f756adcc352d567" "3a727bdc09a7a141e58925258b6e873c65ccf393b2240c51553098ca93957723" "6a37be365d1d95fad2f4d185e51928c789ef7a4ccf17e7ca13ad63a8bf5b922f" default)))
  '(delete-selection-mode t)
  '(electric-indent-mode nil)
  '(electric-pair-mode t)
@@ -211,7 +211,7 @@ Meant to be bound to SPACE
  '(agda2-highlight-primitive-type-face ((t (:foreground "dodger blue"))))
  '(agda2-highlight-record-face ((t (:foreground "dodger blue"))))
  '(diff-removed ((t (:foreground "red3"))))
- '(idris-loaded-region-face ((t nil)))
+ '(idris-loaded-region-face ((t nil)) t)
  '(idris-log-timestamp-face ((t (:foreground "Sky Blue-3" :weight bold))))
  '(idris-prover-processed-face ((t (:inverse-video t))))
  '(idris-semantic-type-face ((t (:foreground "Sky Blue-2"))))

@@ -92,6 +92,18 @@ that uses the minibuffer. Really useful.
     (setq ido-enable-flex-matching t)
     (setq ido-use-faces nil))
 #+end_src
+** Color Theming
+I really like the [[https://github.com/juba/color-theme-tangotango][tangotango theme]].
+
+#+begin_src emacs-lisp
+  (add-to-list 'custom-theme-load-path
+    (concat (file-name-as-directory user-emacs-directory)
+            (file-name-as-directory "site-lisp")
+            "color-theme-tangotango"))
+  (with-demoted-errors
+    (load-theme 'tangotango))
+#+end_src
+
 ** Highlighting
 Enable =global-whitespace-mode= to highlight trailing spaces.
 
