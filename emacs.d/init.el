@@ -1,7 +1,13 @@
 ;; Load org-mode to load main configuration
 (package-initialize t)
-(add-to-list 'load-path "~/.emacs.d/init")
-(add-to-list 'load-path "~/.emacs.d/lang-modes")
+(let ((custom-path-roots '("~/.emacs.d/init"
+                           "~/.emacs.d/site-lisp"
+                           "/usr/local/share/emacs/site-lisp")))
+  (mapc (lambda (default-directory)
+	  (when (file-exists-p default-directory)
+	    (add-to-list 'load-path default-directory)
+	    (normal-top-level-add-subdirs-to-load-path)))
+	custom-path-roots))
 
 (load "nickmeharry-helpers")
 
