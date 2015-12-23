@@ -5,6 +5,9 @@
 *~
 [#]*[#]
 
+# Editor configuration files
+.dir-locals.el
+
 # Compiled files
 *.pyc
 *.elc
@@ -12,3 +15,6 @@
 # Python virtual environments
 .Python
 .venv/
+.venv
+pip-selfcheck.json
+*.bak
