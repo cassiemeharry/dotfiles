@@ -63,6 +63,7 @@ alias grep='grep --color=auto'
 alias nano='nano -w'
 alias memusage="ps -u $LOGNAME -o pid,rss,command | sort -n +1 -2"
 alias edit='emacsclient -nw --alternate-editor="" -c'
+alias visudo='sudo -E visudo'
 
 alias pycheck="python -m py_compile"
 alias dj='python manage.py'

@@ -115,10 +115,10 @@ promptDate () {
 second_row_functions+=(promptDate)
 
 promptMail () {
-    if ! mail -e >/dev/null 2>&1; then
+    if ! command mail -e; then
         return
     fi
-    count=$[$(mail -H | wc -l) - 2]
+    count=$(command mail -H | wc -l | awk '{print $1}')
     print "[\e[35;1mmail\e[0m:\e[35;1m$count\e[0m]"
 }
 second_row_functions+=(promptMail)
