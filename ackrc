@@ -1,7 +1,11 @@
+--smart-case
 --column
---ignore-dir=migrations
 --ignore-dir=node_modules
---type-add
-css=.scss,.sass
---type-set
-elixir=.ex,.exs
+--ignore-dir=python2.7
+--ignore-dir=components
+--type-add=css:ext:scss,sass
+--type-set=csv:ext:csv,tsv
+--type-add=ocaml:ext:mll,mly
+--nocsv
+--nojson
+--ignore-file=firstlinematch:/.{200}/
