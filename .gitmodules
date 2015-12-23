@@ -4,3 +4,6 @@
 [submodule "todotxt-mode"]
 	path = emacs.d/site-lisp/todotxt-mode
 	url = git@github.com:avillafiorita/todotxt-mode.git
+[submodule "elm-mode"]
+	path = emacs.d/site-lisp/elm-mode
+	url = git@github.com:jcollard/elm-mode.git
