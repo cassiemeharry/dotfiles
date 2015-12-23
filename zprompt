@@ -13,6 +13,7 @@
 #
 
 local -aU first_row_functions second_row_functions aux_functions
+local perceived_width_of_dash=1
 
 promptTitle () {
     if [[ $INSIDE_EMACS != "" ]]; then
@@ -172,7 +173,7 @@ prompt () {
         fi
     done
     first_row_length=$(perceivedLength $first_row)
-    first_row_length+=-2
+    (( first_row_length -= $perceived_width_of_dash ))
 
     for func in $second_row_functions; do
         current=$($func | tr -d '\n')
@@ -183,15 +184,15 @@ prompt () {
         fi
     done
     second_row_length=$(perceivedLength $second_row)
-    second_row_length+=-2
+    (( second_row_length -= $perceived_width_of_dash ))
 
     while (( $first_row_length < $second_row_length )); do
         first_row+="─"
-        (( first_row_length += 1 ))
+        (( first_row_length += $perceived_width_of_dash ))
     done
     while (( $first_row_length > $second_row_length )); do
         second_row+="─"
-        (( second_row_length += 1 ))
+        (( second_row_length += $perceived_width_of_dash ))
     done
 
     first_row+="─┐"
