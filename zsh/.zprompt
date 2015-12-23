@@ -115,6 +115,9 @@ promptDate () {
 second_row_functions+=(promptDate)
 
 promptMail () {
+    if ! which mail 2>&1 >/dev/null; then
+        return
+    fi
     if ! command mail -e; then
         return
     fi
